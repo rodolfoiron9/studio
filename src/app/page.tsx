@@ -110,18 +110,6 @@ export default function Home() {
     }
   }, []);
 
-  React.useEffect(() => {
-    // Show/hide landing content based on playback
-    const landingContent = document.getElementById('landing-content');
-    if (landingContent) {
-      if (isPlaying) {
-        landingContent.style.display = 'none';
-      } else {
-        landingContent.style.display = 'flex';
-      }
-    }
-  }, [isPlaying]);
-
   if (!isMounted) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
@@ -154,11 +142,11 @@ export default function Home() {
         />
       </Sheet>
 
-      <LandingContent 
+      {!isPlaying && <LandingContent 
         onTrackSelect={handleTrackSelect}
         playingTrack={playingTrack}
         isPlaying={isPlaying}
-      />
+      />}
     </main>
   );
 }
