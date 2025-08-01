@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -169,8 +170,7 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
           context.textAlign = 'center';
           context.textBaseline = 'middle';
           
-          const lumColor = new THREE.Color();
-          lumColor.set(faceColors[i]);
+          const lumColor = new THREE.Color(faceColors[i]);
           context.fillStyle = lumColor.getLuminance() > 0.5 ? '#000000' : '#FFFFFF';
 
           context.fillText(faceTexts[i], canvas.width / 2, canvas.height / 2);
