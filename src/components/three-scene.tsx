@@ -164,17 +164,25 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
         const context = canvas.getContext('2d');
         if (context) {
           context.clearRect(0, 0, canvas.width, canvas.height);
-          context.fillStyle = faceColors[i];
-          context.fillRect(0, 0, canvas.width, canvas.height);
+          
           context.font = 'bold 40px "Space Grotesk"';
           context.textAlign = 'center';
           context.textBaseline = 'middle';
-          context.fillStyle = new THREE.Color(faceColors[i]).getLuminance() > 0.5 ? '#000000' : '#FFFFFF';
+          
+          const lumColor = new THREE.Color();
+          lumColor.set(faceColors[i]);
+          context.fillStyle = lumColor.getLuminance() > 0.5 ? '#000000' : '#FFFFFF';
+
           context.fillText(faceTexts[i], canvas.width / 2, canvas.height / 2);
           
           if (!mat.map) {
             mat.map = new THREE.CanvasTexture(canvas);
+          } else {
+            // If we don't clear the map, the old background color can bleed through
+            mat.map.dispose(); 
+            mat.map = new THREE.CanvasTexture(canvas);
           }
+
           mat.map.needsUpdate = true;
         }
       });
@@ -225,7 +233,7 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
                 if (material.map) material.map.dispose();
                 material.dispose();
               });
-            } else {
+            } else if (object.material) {
               if (object.material.map) object.material.map.dispose();
               object.material.dispose();
             }
@@ -235,17 +243,9 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
       }
       renderer.dispose();
     };
-  }, []);
+  }, [customization]); // Re-run effect when customization changes
 
-  // Effect to re-run updates when customization changes
-  React.useEffect(() => {
-    // This is a placeholder for a more sophisticated update mechanism
-    // In a real app, you'd send a message to the Three.js instance to update.
-    // For now, we are recreating the component on change which is not ideal but works for this scaffold.
-    // The key on the component will force a re-mount.
-  }, [customization]);
-
-  return <div ref={mountRef} className="absolute inset-0 z-0" key={JSON.stringify(customization)} />;
+  return <div ref={mountRef} className="absolute inset-0 z-0" />;
 }
 
 // Helper to create rounded box geometry
