@@ -7,25 +7,28 @@ import type { CubeCustomization } from "@/lib/types";
 
 // Helper function to calculate luminance from a hex color
 function getLuminance(hex: string) {
-    // Convert hex to RGB
-    let r: number, g: number, b: number;
+    let r_str, g_str, b_str;
     if (hex.length === 4) {
-        r = parseInt(hex[1] + hex[1], 16);
-        g = parseInt(hex[2] + hex[2], 16);
-        b = parseInt(hex[3] + hex[3], 16);
+        r_str = hex[1] + hex[1];
+        g_str = hex[2] + hex[2];
+        b_str = hex[3] + hex[3];
     } else {
-        r = parseInt(hex.slice(1, 3), 16);
-        g = parseInt(hex.slice(3, 5), 16);
-        b = parseInt(hex.slice(5, 7), 16);
+        r_str = hex.slice(1, 3);
+        g_str = hex.slice(3, 5);
+        b_str = hex.slice(5, 7);
     }
+    const r = parseInt(r_str, 16);
+    const g = parseInt(g_str, 16);
+    const b = parseInt(b_str, 16);
     // Apply the luminance formula
     return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
 }
 
 
-export function ThreeScene({ customization }: { customization: CubeCustomization }) {
+export function ThreeScene({ customization, audioElement }: { customization: CubeCustomization, audioElement: HTMLAudioElement | null }) {
   const mountRef = React.useRef<HTMLDivElement>(null);
   const sceneRef = React.useRef<THREE.Scene | null>(null);
+  const audioAnalyserRef = React.useRef<THREE.AudioAnalyser | null>(null);
 
   React.useEffect(() => {
     if (!mountRef.current) return;
@@ -40,6 +43,15 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
     mountRef.current.appendChild(renderer.domElement);
     
     camera.position.z = 5;
+
+    // Audio setup
+    if (audioElement) {
+        const listener = new THREE.AudioListener();
+        camera.add(listener);
+        const audio = new THREE.Audio(listener);
+        audio.setMediaElementSource(audioElement);
+        audioAnalyserRef.current = new THREE.AudioAnalyser(audio, 32);
+    }
 
     // Cube setup
     const geometry = new THREE.BoxGeometry(2.5, 2.5, 2.5);
@@ -77,6 +89,10 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
 
       if (customization.animation === 'pulse') {
         const scale = 1 + Math.sin(elapsedTime * 2) * 0.05;
+        cube.scale.set(scale, scale, scale);
+      } else if (customization.animation === 'audio-reactive' && audioAnalyserRef.current) {
+        const freq = audioAnalyserRef.current.getAverageFrequency();
+        const scale = 1 + (freq / 255) * 0.2;
         cube.scale.set(scale, scale, scale);
       } else {
         cube.scale.set(1, 1, 1);
@@ -259,7 +275,7 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
       }
       renderer.dispose();
     };
-  }, [customization]);
+  }, [customization, audioElement]);
 
   return <div ref={mountRef} className="absolute inset-0 z-0" />;
 }
@@ -288,5 +304,3 @@ function createRoundedBoxGeometry(width: number, height: number, depth: number, 
     geometry.center();
     return geometry;
 }
-
-    

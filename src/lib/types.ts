@@ -1,3 +1,4 @@
+
 export type CubeCustomization = {
   faceColor1: string;
   faceColor2: string;
@@ -20,4 +21,18 @@ export type CubeCustomization = {
   text6: string;
   animation: string;
   environmentImage?: string;
+};
+
+export type Lyric = {
+  time: number;
+  duration: number;
+  word: string;
+  wordIndex: number;
+};
+
+export type Track = {
+  title: string;
+  duration: string;
+  audioSrc: string;
+  lyrics: Lyric[];
 };

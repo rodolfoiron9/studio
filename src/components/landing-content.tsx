@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -5,18 +6,20 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { ALBUM_TRACKS } from '@/lib/constants';
+import type { Track } from '@/lib/types';
 import { PlayIcon, PauseIcon, UserIcon, MusicIcon } from '@/components/icons';
 import { Separator } from './ui/separator';
 
-export function LandingContent() {
-  const [playingTrack, setPlayingTrack] = React.useState<string | null>(null);
+interface LandingContentProps {
+  onTrackSelect: (track: Track) => void;
+  playingTrack: Track | null;
+  isPlaying: boolean;
+}
 
-  const togglePlay = (title: string) => {
-    setPlayingTrack(prev => (prev === title ? null : title));
-  };
-
+export function LandingContent({ onTrackSelect, playingTrack, isPlaying }: LandingContentProps) {
+  
   return (
-    <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-between p-4 md:p-8">
+    <div id="landing-content" className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-between p-4 md:p-8">
       <header className="w-full max-w-6xl text-center">
         <h1 className="font-headline text-5xl font-bold tracking-tighter text-white drop-shadow-lg md:text-7xl">
           RudyBtz
@@ -66,9 +69,9 @@ export function LandingContent() {
                             variant="default"
                             size="icon"
                             className="h-8 w-8 shrink-0 bg-accent text-accent-foreground hover:bg-accent/80"
-                            onClick={() => togglePlay(track.title)}
+                            onClick={() => onTrackSelect(track)}
                           >
-                            {playingTrack === track.title ? <PauseIcon /> : <PlayIcon />}
+                            {playingTrack?.title === track.title && isPlaying ? <PauseIcon /> : <PlayIcon />}
                           </Button>
                           <div>
                             <p className="font-medium">{track.title}</p>
