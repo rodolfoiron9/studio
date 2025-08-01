@@ -6,10 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Bot, User, Loader, Send } from "lucide-react";
+import { Bot, User, Loader, Send, Scan } from "lucide-react";
 import { runDataAgent } from "@/app/actions";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
 type Message = {
@@ -24,16 +24,15 @@ export default function DatabasePage() {
     const [isPending, startTransition] = useTransition();
     const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        if (!query.trim() || isPending) return;
+    const submitQuery = (queryString: string) => {
+        if (!queryString.trim() || isPending) return;
 
-        const userMessage: Message = { role: 'user', content: query };
+        const userMessage: Message = { role: 'user', content: queryString };
         setConversation(prev => [...prev, userMessage]);
         setQuery("");
 
         startTransition(async () => {
-            const result = await runDataAgent(query);
+            const result = await runDataAgent(queryString);
             if (result.success && result.data?.response) {
                 const assistantMessage: Message = { role: 'assistant', content: result.data.response };
                 setConversation(prev => [...prev, assistantMessage]);
@@ -45,12 +44,25 @@ export default function DatabasePage() {
         });
     };
 
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        submitQuery(query);
+    };
+
+    const handleScanProject = () => {
+        const scanQuery = "Please scan the project and create a new knowledge base from the findings.";
+        submitQuery(scanQuery);
+    }
+
     useEffect(() => {
         if (scrollAreaRef.current) {
-            scrollAreaRef.current.scrollTo({
-                top: scrollAreaRef.current.scrollHeight,
-                behavior: 'smooth',
-            });
+            const scrollElement = scrollAreaRef.current.querySelector('div');
+             if (scrollElement) {
+                scrollElement.scrollTo({
+                    top: scrollElement.scrollHeight,
+                    behavior: 'smooth',
+                });
+            }
         }
     }, [conversation]);
     
@@ -62,9 +74,15 @@ export default function DatabasePage() {
             </div>
             
             <Card className="flex-grow flex flex-col">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Bot /> Conversation</CardTitle>
-                    <CardDescription>Ask a question like: &quot;How many tracks are in the album?&quot; or &quot;List the songs that have lyrics defined.&quot;</CardDescription>
+                <CardHeader className="flex flex-row justify-between items-start">
+                    <div>
+                        <CardTitle className="flex items-center gap-2"><Bot /> Conversation</CardTitle>
+                        <CardDescription>Ask a question like: &quot;How many tracks are in the album?&quot; or click Scan Project.</CardDescription>
+                    </div>
+                    <Button variant="outline" onClick={handleScanProject} disabled={isPending}>
+                        <Scan className="mr-2 h-4 w-4"/>
+                        Scan Project & Build Knowledge
+                    </Button>
                 </CardHeader>
                 <CardContent className="flex-grow flex flex-col gap-4">
                     <ScrollArea className="flex-grow pr-4" ref={scrollAreaRef}>
