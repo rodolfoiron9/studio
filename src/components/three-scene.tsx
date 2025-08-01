@@ -8,13 +8,20 @@ import type { CubeCustomization } from "@/lib/types";
 // Helper function to calculate luminance from a hex color
 function getLuminance(hex: string) {
     // Convert hex to RGB
-    const r = parseInt(hex.slice(1, 3), 16) / 255;
-    const g = parseInt(hex.slice(3, 5), 16) / 255;
-    const b = parseInt(hex.slice(5, 7), 16) / 255;
-
+    let r: number, g: number, b: number;
+    if (hex.length === 4) {
+        r = parseInt(hex[1] + hex[1], 16);
+        g = parseInt(hex[2] + hex[2], 16);
+        b = parseInt(hex[3] + hex[3], 16);
+    } else {
+        r = parseInt(hex.slice(1, 3), 16);
+        g = parseInt(hex.slice(3, 5), 16);
+        b = parseInt(hex.slice(5, 7), 16);
+    }
     // Apply the luminance formula
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
 }
+
 
 export function ThreeScene({ customization }: { customization: CubeCustomization }) {
   const mountRef = React.useRef<HTMLDivElement>(null);
@@ -282,3 +289,5 @@ function createRoundedBoxGeometry(width: number, height: number, depth: number, 
     geometry.center();
     return geometry;
 }
+
+    
