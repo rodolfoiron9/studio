@@ -1,3 +1,4 @@
+
 "use server";
 
 import { generateCubePreset } from "@/ai/flows/generate-cube-preset";
@@ -81,13 +82,17 @@ export async function updateTheme(colors: Record<string, string>): Promise<Actio
     let cssContent = await fs.readFile(cssPath, 'utf8');
     
     Object.entries(colors).forEach(([name, value]) => {
-        const regex = new RegExp(`--${name}:\\s*([\\d.]+\\s+[\\d.]+%\\s+[\\d.]+)%`, 'g');
-        cssContent = cssContent.replace(regex, `--${name}: ${value}`);
+      // Regex to find CSS variables like --background: 234.8 64.1% 10%;
+      // It captures the variable name and its HSL value.
+      const regex = new RegExp(`--${name}:\\s*([\\d.]+\\s+[\\d.]+%\\s+[\\d.]+)%`, 'g');
+      cssContent = cssContent.replace(regex, `--${name}: ${value}`);
     });
     
-    // This is a placeholder for the actual file write, as it's restricted.
-    // In a real scenario, you would use fs.writeFile here.
-    console.log("Simulating theme update. New CSS content would be:", cssContent.substring(0, 500) + "...");
+    // In a real app with write access, you'd uncomment the next line:
+    // await fs.writeFile(cssPath, cssContent, 'utf8');
+    
+    // For this prototype, we'll log what would be written.
+    console.log("Simulating theme update. New CSS content for globals.css would be written.");
     
     return { success: true, data: "Theme updated successfully (simulation)." };
   } catch (error: any) {
