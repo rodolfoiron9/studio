@@ -33,6 +33,14 @@
     --ring: 182.5 100% 74.3%;
 
     --radius: 0.5rem;
+    
+    /* Sidebar specific theme */
+    --sidebar-background: 234.8 64.1% 8%;
+    --sidebar-foreground: 240 100% 99%;
+    --sidebar-border: 234.8 64.1% 20%;
+    --sidebar-accent: 282.8 100% 61.4%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-ring: 182.5 100% 74.3%;
   }
 
   .dark {
@@ -63,6 +71,14 @@
     --border: 234.8 64.1% 20%;
     --input: 234.8 64.1% 20%;
     --ring: 182.5 100% 74.3%;
+
+    /* Sidebar specific theme */
+    --sidebar-background: 234.8 64.1% 8%;
+    --sidebar-foreground: 240 100% 99%;
+    --sidebar-border: 234.8 64.1% 20%;
+    --sidebar-accent: 282.8 100% 61.4%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-ring: 182.5 100% 74.3%;
   }
 }
 

@@ -9,12 +9,37 @@ import { ALBUM_TRACKS } from '@/lib/constants';
 import type { Track } from '@/lib/types';
 import { PlayIcon, PauseIcon, UserIcon, MusicIcon } from '@/components/icons';
 import { Separator } from './ui/separator';
+import { Youtube, Dribbble, Twitter } from 'lucide-react'; // Placeholder icons
 
 interface LandingContentProps {
   onTrackSelect: (track: Track) => void;
   playingTrack: Track | null;
   isPlaying: boolean;
 }
+
+const SocialLinks = () => (
+    <div className="flex justify-center gap-4 mt-4">
+        <Button variant="ghost" size="icon" asChild>
+            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">
+                <Youtube className="h-6 w-6 text-red-600"/>
+                <span className="sr-only">YouTube</span>
+            </a>
+        </Button>
+        <Button variant="ghost" size="icon" asChild>
+            <a href="https://soundcloud.com" target="_blank" rel="noopener noreferrer">
+                {/* Using Dribble as placeholder for SoundCloud */}
+                <Dribbble className="h-6 w-6 text-orange-500"/>
+                <span className="sr-only">SoundCloud</span>
+            </a>
+        </Button>
+        <Button variant="ghost" size="icon" asChild>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+                <Twitter className="h-6 w-6 text-blue-400"/>
+                <span className="sr-only">Twitter</span>
+            </a>
+        </Button>
+    </div>
+)
 
 export function LandingContent({ onTrackSelect, playingTrack, isPlaying }: LandingContentProps) {
   
@@ -27,6 +52,9 @@ export function LandingContent({ onTrackSelect, playingTrack, isPlaying }: Landi
         <p className="mt-2 text-xl text-accent drop-shadow-md md:text-2xl">
           Making Magic - The Album
         </p>
+         <div className="pointer-events-auto">
+          <SocialLinks />
+        </div>
       </header>
 
       <div className="grid h-full w-full max-w-6xl grid-cols-1 gap-4 pt-8 md:grid-cols-3 md:pt-0">
