@@ -195,7 +195,6 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
           if (!mat.map) {
             mat.map = new THREE.CanvasTexture(canvas);
           } else {
-            // If we don't clear the map, the old background color can bleed through
             mat.map.dispose(); 
             mat.map = new THREE.CanvasTexture(canvas);
           }
@@ -260,7 +259,7 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
       }
       renderer.dispose();
     };
-  }, [customization]); // Re-run effect when customization changes
+  }, [customization]);
 
   return <div ref={mountRef} className="absolute inset-0 z-0" />;
 }
