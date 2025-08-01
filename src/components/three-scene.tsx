@@ -6,12 +6,14 @@ import type { CubeCustomization } from "@/lib/types";
 
 export function ThreeScene({ customization }: { customization: CubeCustomization }) {
   const mountRef = React.useRef<HTMLDivElement>(null);
+  const sceneRef = React.useRef<THREE.Scene | null>(null);
 
   React.useEffect(() => {
     if (!mountRef.current) return;
 
     // Scene setup
     const scene = new THREE.Scene();
+    sceneRef.current = scene;
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -167,7 +169,7 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
           context.font = 'bold 40px "Space Grotesk"';
           context.textAlign = 'center';
           context.textBaseline = 'middle';
-          context.fillStyle = mat.color.getLuminance() > 0.5 ? '#000000' : '#FFFFFF';
+          context.fillStyle = new THREE.Color(faceColors[i]).getLuminance() > 0.5 ? '#000000' : '#FFFFFF';
           context.fillText(faceTexts[i], canvas.width / 2, canvas.height / 2);
           
           if (!mat.map) {
@@ -207,15 +209,31 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
     return () => {
       cancelAnimationFrame(animationId);
       window.removeEventListener('resize', handleResize);
-      if (mountRef.current) {
+      if (mountRef.current && renderer.domElement) {
         mountRef.current.removeChild(renderer.domElement);
       }
-      geometry.dispose();
-      materials.forEach(mat => {
-        if (mat.map) mat.map.dispose();
-        mat.dispose()
-      });
-      scene.clear();
+      
+      // Dispose of scene objects
+      if (sceneRef.current) {
+        sceneRef.current.traverse(object => {
+          if (object instanceof THREE.Mesh) {
+            if (object.geometry) {
+              object.geometry.dispose();
+            }
+            if (Array.isArray(object.material)) {
+              object.material.forEach(material => {
+                if (material.map) material.map.dispose();
+                material.dispose();
+              });
+            } else {
+              if (object.material.map) object.material.map.dispose();
+              object.material.dispose();
+            }
+          }
+        });
+        sceneRef.current = null;
+      }
+      renderer.dispose();
     };
   }, []);
 
