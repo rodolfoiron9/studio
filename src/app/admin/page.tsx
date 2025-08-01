@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Home, Settings, Database, Palette, KeyRound, Film, Image, Megaphone, Link as LinkIcon } from "lucide-react";
+import { Home, Settings, Database, Palette, KeyRound, Film, Image, Megaphone, Link as LinkIcon, Folder } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminDashboard() {
@@ -12,6 +12,13 @@ export default function AdminDashboard() {
       title: "Data Management", 
       description: "Manage datasets, databases, and content for the application.",
       content: "Use the AI Agent to interact with your data, check for quality, and get enhancement suggestions."
+    },
+    { 
+      href: "/admin/file-management", 
+      icon: <Folder/>, 
+      title: "File Management", 
+      description: "Manage all project assets in one place.",
+      content: "Organize images, music, 3D files, and generated content."
     },
     { 
       href: "/admin/ui-customization", 

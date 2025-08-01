@@ -3,7 +3,7 @@
 
 import * as React from "react";
 import { Sidebar, SidebarProvider, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
-import { Home, Settings, Database, Palette, KeyRound, Film, Image, Megaphone, Link as LinkIcon } from "lucide-react";
+import { Home, Settings, Database, Palette, KeyRound, Film, Image, Megaphone, Link as LinkIcon, Folder } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -42,6 +42,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <Link href="/admin/database">
                         <Database />
                         <span>Database</span>
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/file-management")}>
+                    <Link href="/admin/file-management">
+                        <Folder />
+                        <span>File Management</span>
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>
