@@ -41,7 +41,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/database")}>
                     <Link href="/admin/database">
                         <Database />
-                        <span>Database</span>
+                        <span>Data Management</span>
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>
