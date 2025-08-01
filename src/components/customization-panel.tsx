@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { Dispatch, SetStateAction } from "react";
@@ -13,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import { AiPanel } from "./ai-panel";
 import { Upload } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface CustomizationPanelProps {
   customization: CubeCustomization;
@@ -219,3 +221,5 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
     </SheetContent>
   );
 }
+
+    
