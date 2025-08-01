@@ -167,7 +167,7 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
           context.font = 'bold 40px "Space Grotesk"';
           context.textAlign = 'center';
           context.textBaseline = 'middle';
-          context.fillStyle = new THREE.Color(faceColors[i]).getLuminance() > 0.5 ? '#000000' : '#FFFFFF';
+          context.fillStyle = mat.color.getLuminance() > 0.5 ? '#000000' : '#FFFFFF';
           context.fillText(faceTexts[i], canvas.width / 2, canvas.height / 2);
           
           if (!mat.map) {
@@ -207,9 +207,14 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
     return () => {
       cancelAnimationFrame(animationId);
       window.removeEventListener('resize', handleResize);
-      mountRef.current?.removeChild(renderer.domElement);
+      if (mountRef.current) {
+        mountRef.current.removeChild(renderer.domElement);
+      }
       geometry.dispose();
-      materials.forEach(mat => mat.dispose());
+      materials.forEach(mat => {
+        if (mat.map) mat.map.dispose();
+        mat.dispose()
+      });
       scene.clear();
     };
   }, []);
@@ -222,7 +227,7 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
     // The key on the component will force a re-mount.
   }, [customization]);
 
-  return <div ref={mountRef} className="absolute inset-0 z-0" />;
+  return <div ref={mountRef} className="absolute inset-0 z-0" key={JSON.stringify(customization)} />;
 }
 
 // Helper to create rounded box geometry
