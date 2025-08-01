@@ -172,7 +172,8 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
           context.textAlign = 'center';
           context.textBaseline = 'middle';
           
-          context.fillStyle = lumColor.set(faceColors[i]).getLuminance() > 0.5 ? '#000000' : '#FFFFFF';
+          lumColor.set(faceColors[i]);
+          context.fillStyle = lumColor.getLuminance() > 0.5 ? '#000000' : '#FFFFFF';
 
           context.fillText(faceTexts[i], canvas.width / 2, canvas.height / 2);
           
@@ -273,3 +274,5 @@ function createRoundedBoxGeometry(width: number, height: number, depth: number, 
     geometry.center();
     return geometry;
 }
+
+    
