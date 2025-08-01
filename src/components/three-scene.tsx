@@ -154,6 +154,8 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
         customization.text1, customization.text2, customization.text3,
         customization.text4, customization.text5, customization.text6,
       ];
+      
+      const lumColor = new THREE.Color();
 
       (cube.material as THREE.MeshStandardMaterial[]).forEach((mat, i) => {
         mat.color.set(faceColors[i]);
@@ -170,8 +172,7 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
           context.textAlign = 'center';
           context.textBaseline = 'middle';
           
-          const lumColor = new THREE.Color(faceColors[i]);
-          context.fillStyle = lumColor.getLuminance() > 0.5 ? '#000000' : '#FFFFFF';
+          context.fillStyle = lumColor.set(faceColors[i]).getLuminance() > 0.5 ? '#000000' : '#FFFFFF';
 
           context.fillText(faceTexts[i], canvas.width / 2, canvas.height / 2);
           
