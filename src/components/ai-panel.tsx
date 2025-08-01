@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useTransition } from 'react';
@@ -15,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { runPresetGenerator, runEnvironmentGenerator, runAnimationGenerator, runVideoGenerator, runAlbumArtGenerator } from '@/app/actions';
 import { MagicWandIcon } from './icons';
 import { Loader } from 'lucide-react';
+import Image from 'next/image';
 
 interface AiPanelProps {
     setCustomization: Dispatch<SetStateAction<CubeCustomization>>;
@@ -150,8 +152,7 @@ export function AiPanel({ setCustomization, currentCustomization }: AiPanelProps
                     title: "Album Art Generated!",
                     description: "AI has created your new album art.",
                     duration: 8000,
-                    // Note: This is a simple way to display. A real app might have a dedicated modal.
-                    action: <img src={result.data.imageUrl} className="w-20 h-20 rounded-md" alt="Generated album art"/>
+                    action: <Image src={result.data.imageUrl} className="w-20 h-20 rounded-md" alt="Generated album art" width={80} height={80} />
                 });
             } else {
                 toast({ variant: 'destructive', title: "Error", description: result.error });
@@ -304,3 +305,5 @@ export function AiPanel({ setCustomization, currentCustomization }: AiPanelProps
     </div>
   );
 }
+
+    
