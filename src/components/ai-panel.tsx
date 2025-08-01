@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { runPresetGenerator, runEnvironmentGenerator, runAnimationGenerator } from '@/app/actions';
+import { runPresetGenerator, runEnvironmentGenerator, runAnimationGenerator, runVideoGenerator, runAlbumArtGenerator } from '@/app/actions';
 import { MagicWandIcon } from './icons';
 import { Loader } from 'lucide-react';
 
@@ -33,6 +33,15 @@ const animationSchema = z.object({
     musicStyle: z.string().min(3, "Please describe a music style or mood."),
 });
 
+const videoSchema = z.object({
+  prompt: z.string().min(5, "Please describe the video you want to create."),
+});
+
+const albumArtSchema = z.object({
+  prompt: z.string().min(5, "Please describe the album art you want to create."),
+});
+
+
 export function AiPanel({ setCustomization, currentCustomization }: AiPanelProps) {
     const { toast } = useToast();
     const [isPending, startTransition] = useTransition();
@@ -52,6 +61,17 @@ export function AiPanel({ setCustomization, currentCustomization }: AiPanelProps
         resolver: zodResolver(animationSchema),
         defaultValues: { musicStyle: "liquid funk drum and bass" },
     });
+
+    const videoForm = useForm<z.infer<typeof videoSchema>>({
+        resolver: zodResolver(videoSchema),
+        defaultValues: { prompt: "A majestic dragon soaring over a mystical forest at dawn" },
+    });
+
+    const albumArtForm = useForm<z.infer<typeof albumArtSchema>>({
+        resolver: zodResolver(albumArtSchema),
+        defaultValues: { prompt: "A futuristic cube floating in a synthwave landscape" },
+    });
+
 
     const onPresetSubmit = (values: z.infer<typeof presetSchema>) => {
         startTransition(async () => {
@@ -101,6 +121,44 @@ export function AiPanel({ setCustomization, currentCustomization }: AiPanelProps
             }
         });
     };
+
+    const onVideoSubmit = (values: z.infer<typeof videoSchema>) => {
+        startTransition(async () => {
+            toast({ title: "Generating Video...", description: "This may take a minute. Please wait."});
+            const result = await runVideoGenerator(values.prompt);
+            if (result.success && result.data?.video) {
+                setCustomization(prev => ({
+                    ...prev,
+                    background: 'video',
+                    environmentVideo: result.data.video,
+                }));
+                toast({ title: "Video Environment Created!", description: "The background has been updated." });
+            } else {
+                toast({ variant: 'destructive', title: "Error", description: result.error });
+            }
+        });
+    };
+
+    const onAlbumArtSubmit = (values: z.infer<typeof albumArtSchema>) => {
+        startTransition(async () => {
+             toast({ title: "Generating Album Art...", description: "The AI is creating your album art."});
+            const result = await runAlbumArtGenerator(values.prompt);
+             if (result.success && result.data) {
+                // For now, we just show the image in a toast.
+                // A real implementation would allow saving it or applying to the cube.
+                toast({
+                    title: "Album Art Generated!",
+                    description: "AI has created your new album art.",
+                    duration: 8000,
+                    // Note: This is a simple way to display. A real app might have a dedicated modal.
+                    action: <img src={result.data.imageUrl} className="w-20 h-20 rounded-md" alt="Generated album art"/>
+                });
+            } else {
+                toast({ variant: 'destructive', title: "Error", description: result.error });
+            }
+        });
+    };
+
 
     const handleMagicHand = () => {
       startMagicTransition(async () => {
@@ -180,6 +238,44 @@ export function AiPanel({ setCustomization, currentCustomization }: AiPanelProps
                             )} />
                             <Button type="submit" disabled={isPending} className="w-full">
                                 {isPending ? <Loader className="animate-spin" /> : "Generate Environment"}
+                            </Button>
+                        </form>
+                    </Form>
+                </AccordionContent>
+            </AccordionItem>
+             <AccordionItem value="video-environment">
+                <AccordionTrigger>AI Video Environment (Veo)</AccordionTrigger>
+                <AccordionContent>
+                    <Form {...videoForm}>
+                        <form onSubmit={videoForm.handleSubmit(onVideoSubmit)} className="space-y-4">
+                            <FormField control={videoForm.control} name="prompt" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Video Prompt</FormLabel>
+                                    <FormControl><Textarea placeholder="e.g., a time-lapse of a futuristic city" {...field} /></FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                            <Button type="submit" disabled={isPending} className="w-full">
+                                {isPending ? <Loader className="animate-spin" /> : "Generate Video"}
+                            </Button>
+                        </form>
+                    </Form>
+                </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="album-art">
+                <AccordionTrigger>AI Album Art Generator</AccordionTrigger>
+                <AccordionContent>
+                    <Form {...albumArtForm}>
+                        <form onSubmit={albumArtForm.handleSubmit(onAlbumArtSubmit)} className="space-y-4">
+                            <FormField control={albumArtForm.control} name="prompt" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Album Art Prompt</FormLabel>
+                                    <FormControl><Textarea placeholder="e.g., a vibrant, abstract representation of soundwaves" {...field} /></FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                            <Button type="submit" disabled={isPending} className="w-full">
+                                {isPending ? <Loader className="animate-spin" /> : "Generate Art"}
                             </Button>
                         </form>
                     </Form>

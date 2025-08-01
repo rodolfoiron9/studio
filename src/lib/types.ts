@@ -7,9 +7,10 @@ export type CubeCustomization = {
   faceColor5: string;
   faceColor6: string;
   edgeStyle: 'sharp' | 'round' | 'bevel';
-  wireframe: boolean;
+  materialStyle: 'solid' | 'wireframe' | 'cartoon' | 'realist' | 'draw' | 'quantum dist';
+  wireframe: boolean; // This can be deprecated in favor of materialStyle
   roundness: number;
-  background: 'snow' | 'particles' | 'image';
+  background: 'snow' | 'particles' | 'image' | 'video';
   particleColor1: string;
   particleColor2: string;
   particleColor3: string;
@@ -21,6 +22,7 @@ export type CubeCustomization = {
   text6: string;
   animation: string;
   environmentImage?: string;
+  environmentVideo?: string;
 };
 
 export type Lyric = {

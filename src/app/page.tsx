@@ -16,6 +16,8 @@ export default function Home() {
   const [playingTrack, setPlayingTrack] = React.useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = React.useState(false);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
+  const videoRef = React.useRef<HTMLVideoElement | null>(null);
+
 
   const [customization, setCustomization] = React.useState<CubeCustomization>({
     faceColor1: "#0a0a1a",
@@ -26,6 +28,7 @@ export default function Home() {
     faceColor6: "#0a0a1a",
     edgeStyle: "round",
     wireframe: true,
+    materialStyle: 'solid',
     roundness: 0.2,
     background: "snow",
     particleColor1: "#7DF9FF",
@@ -110,6 +113,13 @@ export default function Home() {
     }
   }, []);
 
+  React.useEffect(() => {
+    if (customization.background === 'video' && customization.environmentVideo && videoRef.current) {
+      videoRef.current.src = customization.environmentVideo;
+      videoRef.current.play();
+    }
+  }, [customization.background, customization.environmentVideo])
+
   if (!isMounted) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
@@ -120,6 +130,16 @@ export default function Home() {
 
   return (
     <main className="relative h-screen w-screen overflow-hidden">
+        {customization.background === 'video' && (
+            <video 
+                ref={videoRef}
+                className="absolute inset-0 h-full w-full object-cover z-[-1]"
+                loop
+                muted
+                autoPlay
+                playsInline
+            />
+        )}
       <ThreeScene 
         customization={customization} 
         audioElement={audioRef.current}

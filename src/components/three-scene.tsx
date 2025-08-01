@@ -7,17 +7,10 @@ import type { CubeCustomization } from "@/lib/types";
 
 // Helper function to calculate luminance from a hex color
 function getLuminance(hex: string) {
-    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-    const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-    hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
-
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    if (!result) {
-        return 0; // Invalid hex
-    }
-    const r = parseInt(result[1], 16);
-    const g = parseInt(result[2], 16);
-    const b = parseInt(result[3], 16);
+    hex = hex.replace("#", "");
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
     // Standard luminance formula
     return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
 }
@@ -173,7 +166,7 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
           scene.background = texture;
           scene.environment = texture;
       });
-    } else {
+    } else if (customization.background !== 'video') {
       scene.background = null;
       scene.environment = null;
     }
@@ -251,7 +244,7 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
 
     (cube.material as THREE.MeshStandardMaterial[]).forEach((mat, i) => {
       mat.color.set(faceColors[i]);
-      mat.wireframe = customization.wireframe;
+      mat.wireframe = customization.materialStyle === 'wireframe';
       
       const canvas = textCanvasesRef.current[i];
       const context = canvas.getContext('2d');
