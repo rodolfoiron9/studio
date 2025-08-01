@@ -7,3 +7,4 @@ import '@/ai/flows/generate-quantum-animation.ts';
 import '@/ai/flows/generate-video.ts';
 import '@/ai/flows/generate-album-art.ts';
 import '@/ai/flows/generate-marketing-copy.ts';
+import '@/ai/flows/manage-data.ts';

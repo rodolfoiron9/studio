@@ -7,6 +7,7 @@ import { generateQuantumAnimation } from "@/ai/flows/generate-quantum-animation"
 import { generateVideo } from "@/ai/flows/generate-video";
 import { generateAlbumArt } from "@/ai/flows/generate-album-art";
 import { generateMarketingCopy } from "@/ai/flows/generate-marketing-copy";
+import { manageData } from "@/ai/flows/manage-data";
 import {promises as fs} from 'fs';
 import path from 'path';
 
@@ -75,6 +76,17 @@ export async function runMarketingAgent(trackTitle: string): Promise<ActionResul
         return { success: false, error: `Marketing agent failed: ${error.message}` };
     }
 }
+
+export async function runDataAgent(query: string): Promise<ActionResult<Awaited<ReturnType<typeof manageData>>>> {
+    try {
+        const result = await manageData({ query });
+        return { success: true, data: result };
+    } catch (error: any) {
+        console.error("Data agent failed:", error);
+        return { success: false, error: `Data agent failed: ${error.message}` };
+    }
+}
+
 
 export async function updateTheme(colors: Record<string, string>): Promise<ActionResult<string>> {
   try {
