@@ -5,6 +5,17 @@ import * as React from "react";
 import * as THREE from "three";
 import type { CubeCustomization } from "@/lib/types";
 
+// Helper function to calculate luminance from a hex color
+function getLuminance(hex: string) {
+    // Convert hex to RGB
+    const r = parseInt(hex.slice(1, 3), 16) / 255;
+    const g = parseInt(hex.slice(3, 5), 16) / 255;
+    const b = parseInt(hex.slice(5, 7), 16) / 255;
+
+    // Apply the luminance formula
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
 export function ThreeScene({ customization }: { customization: CubeCustomization }) {
   const mountRef = React.useRef<HTMLDivElement>(null);
   const sceneRef = React.useRef<THREE.Scene | null>(null);
@@ -154,8 +165,6 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
         customization.text1, customization.text2, customization.text3,
         customization.text4, customization.text5, customization.text6,
       ];
-      
-      const lumColor = new THREE.Color();
 
       (cube.material as THREE.MeshStandardMaterial[]).forEach((mat, i) => {
         mat.color.set(faceColors[i]);
@@ -172,8 +181,7 @@ export function ThreeScene({ customization }: { customization: CubeCustomization
           context.textAlign = 'center';
           context.textBaseline = 'middle';
           
-          lumColor.set(faceColors[i]);
-          context.fillStyle = lumColor.getLuminance() > 0.5 ? '#000000' : '#FFFFFF';
+          context.fillStyle = getLuminance(faceColors[i]) > 0.5 ? '#000000' : '#FFFFFF';
 
           context.fillText(faceTexts[i], canvas.width / 2, canvas.height / 2);
           
@@ -274,5 +282,3 @@ function createRoundedBoxGeometry(width: number, height: number, depth: number, 
     geometry.center();
     return geometry;
 }
-
-    
