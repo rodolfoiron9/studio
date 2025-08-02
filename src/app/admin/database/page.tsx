@@ -93,7 +93,7 @@ export default function DatabasePage() {
                                        </Avatar>
                                    )}
                                    <div className={cn(
-                                       "max-w-prose p-3 rounded-lg prose prose-sm prose-invert prose-p:my-0", 
+                                       "max-w-prose p-3 rounded-lg prose-sm prose-invert prose-p:my-0",
                                        message.role === 'user' ? "bg-primary text-primary-foreground" : "bg-muted"
                                     )}>
                                         <p className="whitespace-pre-wrap font-sans">{message.content}</p>
