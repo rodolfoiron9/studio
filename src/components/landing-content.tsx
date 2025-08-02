@@ -76,7 +76,7 @@ export function LandingContent({ onTrackSelect, playingTrack, isPlaying }: Landi
                                 <Button
                                     variant="default"
                                     size="icon"
-                                    className="h-8 w-8 shrink-0 bg-accent text-accent-foreground hover:bg-accent/80"
+                                    className="h-8 w-8 shrink-0 bg-primary text-primary-foreground hover:bg-primary/80"
                                     onClick={() => onTrackSelect(track)}
                                 >
                                     {playingTrack?.title === track.title && isPlaying ? <PauseIcon /> : <PlayIcon />}
