@@ -140,8 +140,10 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
         cameraRef.current.add(listener);
         const audio = new THREE.Audio(listener);
         try {
-            // Check if a source is already connected
-            if (!audio.source) {
+            // FIX: Check if the source is already connected before setting it.
+            // This prevents errors during React Strict Mode hot reloads in development.
+            if (!audio.source && !(audioElement as any)._connected) {
+                (audioElement as any)._connected = true; // Mark as connected
                 audio.setMediaElementSource(audioElement);
                 audioAnalyserRef.current = new THREE.AudioAnalyser(audio, 32);
             }
@@ -248,17 +250,22 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
 
     (cube.material as THREE.MeshStandardMaterial[]).forEach((mat, i) => {
       mat.color.set(faceColors[i]);
-      mat.wireframe = customization.materialStyle === 'wireframe';
       
       switch (customization.materialStyle) {
           case 'cartoon':
               mat.flatShading = true;
+              mat.wireframe = false;
               break;
           case 'realist':
                mat.flatShading = false;
+               mat.wireframe = false;
                break;
+          case 'wireframe':
+                mat.wireframe = true;
+                break;
           default:
               mat.flatShading = false;
+              mat.wireframe = false;
               break;
       }
 
