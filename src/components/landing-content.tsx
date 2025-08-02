@@ -29,7 +29,7 @@ export function LandingContent({ onTrackSelect, playingTrack, isPlaying }: Landi
             exit={{ opacity: 0, transition: { duration: 0.5 } }}
         >
             <div className="w-full max-w-6xl text-center mb-8">
-                <h1 className="font-headline text-5xl font-bold tracking-tighter text-white drop-shadow-lg md:text-7xl">
+                <h1 className="font-headline text-5xl font-bold tracking-tighter text-white drop-shadow-lg md:text-7xl text-3d">
                 RudyBtz
                 </h1>
                 <p className="mt-2 text-xl text-accent drop-shadow-md md:text-2xl">
@@ -41,7 +41,7 @@ export function LandingContent({ onTrackSelect, playingTrack, isPlaying }: Landi
                 <div className="pointer-events-auto md:col-span-1">
                 <Card className="h-full bg-background/50 backdrop-blur-sm">
                     <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-violet-400">
                         <UserIcon className="h-6 w-6" /> About the Artist
                     </CardTitle>
                     <CardDescription>An Innovative Music Producer</CardDescription>
@@ -61,7 +61,7 @@ export function LandingContent({ onTrackSelect, playingTrack, isPlaying }: Landi
                 <div className="pointer-events-auto md:col-span-2">
                 <Card className="h-full bg-background/50 backdrop-blur-sm">
                     <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-violet-400">
                         <MusicIcon className="h-6 w-6" /> Making Magic - Tracklist
                     </CardTitle>
                     <CardDescription>20 tracks released October 2024</CardDescription>
