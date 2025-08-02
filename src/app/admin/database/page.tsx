@@ -58,7 +58,7 @@ export default function DatabasePage() {
         if (scrollAreaRef.current) {
             const scrollElement = scrollAreaRef.current.querySelector('div');
              if (scrollElement) {
-                scrollElement.scrollTo({
+                scrollElement.parentElement?.scrollTo({
                     top: scrollElement.scrollHeight,
                     behavior: 'smooth',
                 });
@@ -67,7 +67,7 @@ export default function DatabasePage() {
     }, [conversation]);
     
     return (
-        <div className="p-4 md:p-8 h-[calc(100vh-1rem)] flex flex-col">
+        <div className="p-4 md:p-8 h-[calc(100vh-4rem)] flex flex-col">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold font-headline">AI Data Agent</h1>
                 <p className="text-muted-foreground">Ask questions about your project's data in natural language.</p>
