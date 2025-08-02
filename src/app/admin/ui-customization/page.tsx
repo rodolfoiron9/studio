@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -106,7 +106,7 @@ function hslToHex(hslStr: string): string {
 
 export default function UICustomizationPage() {
     const { toast } = useToast();
-    const [isLoading, setIsLoading] = useState(false);
+    const [isPending, startTransition] = useTransition();
     const [colors, setColors] = useState<ThemeColors>(initialColors);
     const [fonts, setFonts] = useState<ThemeFonts>(initialFonts);
 
@@ -136,22 +136,20 @@ export default function UICustomizationPage() {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        setIsLoading(true);
-        toast({ title: "Saving Theme...", description: "Applying your new theme permanently."});
-        
-        // This is where you'd actually save to a database or config file.
-        // For now, we use the server action which simulates writing to globals.css
-        const result = await updateTheme(colors);
+        startTransition(async () => {
+            toast({ title: "Saving Theme...", description: "Applying your new theme permanently."});
+            
+            const result = await updateTheme(colors);
 
-        if (result.success) {
-             toast({
-                title: "Theme Saved!",
-                description: "Your new color theme has been applied. A page refresh may be needed to see changes everywhere.",
-            });
-        } else {
-             toast({ variant: 'destructive', title: "Error", description: result.error });
-        }
-        setIsLoading(false);
+            if (result.success) {
+                 toast({
+                    title: "Theme Saved!",
+                    description: "Your new color theme has been applied. A page refresh may be needed to see changes everywhere.",
+                });
+            } else {
+                 toast({ variant: 'destructive', title: "Error", description: result.error });
+            }
+        });
     };
 
     return (
@@ -161,7 +159,7 @@ export default function UICustomizationPage() {
                     <h1 className="text-3xl font-bold font-headline">Live UI Customization</h1>
                     <p className="text-muted-foreground">Customize the look and feel of your application. Changes are previewed live.</p>
                 </div>
-                 <Button onClick={handleReset} variant="outline" disabled={isLoading}>
+                 <Button onClick={handleReset} variant="outline" disabled={isPending}>
                     <RefreshCw className="mr-2"/> Reset to Default
                 </Button>
             </div>
@@ -190,7 +188,7 @@ export default function UICustomizationPage() {
                                                 value={hslToHex(value)}
                                                 onChange={(e) => handleColorChange(name as keyof ThemeColors, e.target.value)}
                                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                                disabled={isLoading}
+                                                disabled={isPending}
                                             />
                                             <div className="h-10 w-full rounded-md border border-input px-3 py-2 text-sm flex items-center" style={{ backgroundColor: hslToHex(value) }}>
                                                 <span className="mix-blend-difference text-white">{hslToHex(value)}</span>
@@ -206,7 +204,7 @@ export default function UICustomizationPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <Label htmlFor="font-headline">Headline Font</Label>
-                                    <Select value={fonts.headline} onValueChange={(value) => handleFontChange('headline', value)} disabled={isLoading}>
+                                    <Select value={fonts.headline} onValueChange={(value) => handleFontChange('headline', value)} disabled={isPending}>
                                         <SelectTrigger id="font-headline"><SelectValue /></SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="'Space Grotesk', sans-serif" style={{fontFamily: "'Space Grotesk', sans-serif"}}>Space Grotesk</SelectItem>
@@ -216,7 +214,7 @@ export default function UICustomizationPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="font-body">Body Font</Label>
-                                    <Select value={fonts.body} onValueChange={(value) => handleFontChange('body', value)} disabled={isLoading}>
+                                    <Select value={fonts.body} onValueChange={(value) => handleFontChange('body', value)} disabled={isPending}>
                                         <SelectTrigger id="font-body"><SelectValue /></SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="'Space Grotesk', sans-serif" style={{fontFamily: "'Space Grotesk', sans-serif"}}>Space Grotesk</SelectItem>
@@ -228,9 +226,9 @@ export default function UICustomizationPage() {
                         </div>
                     </CardContent>
                     <CardFooter className="border-t pt-6">
-                        <Button type="submit" disabled={isLoading} className="ml-auto">
-                            {isLoading ? <Loader className="animate-spin" /> : <Save className="mr-2" />}
-                            {isLoading ? "Saving..." : "Save and Apply Theme"}
+                        <Button type="submit" disabled={isPending} className="ml-auto">
+                            {isPending ? <Loader className="animate-spin" /> : <Save className="mr-2" />}
+                            {isPending ? "Saving..." : "Save and Apply Theme"}
                         </Button>
                     </CardFooter>
                 </Card>
