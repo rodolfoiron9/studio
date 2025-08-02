@@ -48,22 +48,6 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
     
     camera.position.z = 5;
 
-    // Audio setup (only if audioElement is provided)
-    if (audioElement) {
-        const listener = new THREE.AudioListener();
-        camera.add(listener);
-        const audio = new THREE.Audio(listener);
-        // This is the key change: we check if the source is already set.
-        if (!audio.source) {
-            try {
-                audio.setMediaElementSource(audioElement);
-                audioAnalyserRef.current = new THREE.AudioAnalyser(audio, 32);
-            } catch (e) {
-                console.error("Error setting up audio source:", e);
-            }
-        }
-    }
-
     const geometry = new THREE.BoxGeometry(2.5, 2.5, 2.5);
     const materials = Array(6).fill(null).map(() => new THREE.MeshStandardMaterial({ color: 0xffffff }));
     const cube = new THREE.Mesh(geometry, materials);
@@ -147,7 +131,23 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
       renderer.dispose();
       sceneRef.current = null;
     };
-  }, [audioElement]); // Only re-initialize if the audio element itself changes.
+  }, []); // Only re-initialize if the audio element itself changes.
+
+  // Effect to set up audio - runs only when audioElement changes
+  React.useEffect(() => {
+    if (audioElement && cameraRef.current) {
+        const listener = new THREE.AudioListener();
+        cameraRef.current.add(listener);
+        const audio = new THREE.Audio(listener);
+        try {
+            audio.setMediaElementSource(audioElement);
+            audioAnalyserRef.current = new THREE.AudioAnalyser(audio, 32);
+        } catch (e) {
+            // Error is expected on hot reloads, we can ignore it.
+            // A more robust solution might check if the context is already connected.
+        }
+    }
+  }, [audioElement]);
 
 
   // Effect for updating the scene based on customization changes
