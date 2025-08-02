@@ -5,16 +5,18 @@ import * as React from "react";
 import { ThreeScene } from "@/components/three-scene";
 import { LandingContent } from "@/components/landing-content";
 import { CustomizationPanel } from "@/components/customization-panel";
-import type { CubeCustomization, Track } from "@/lib/types";
+import type { CubeCustomization, Track, Lyric } from "@/lib/types";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Settings, Loader } from "lucide-react";
-import { ALBUM_TRACKS } from "@/lib/constants";
+import { SyncedLyrics } from "@/components/synced-lyrics";
+
 
 export default function Home() {
   const [isMounted, setIsMounted] = React.useState(false);
   const [playingTrack, setPlayingTrack] = React.useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = React.useState(false);
+  const [currentLyric, setCurrentLyric] = React.useState<Lyric | null>(null);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
 
@@ -45,24 +47,27 @@ export default function Home() {
   });
 
   const handleTimeUpdate = () => {
-    if (!audioRef.current || !playingTrack?.lyrics) return;
+    if (!audioRef.current || !playingTrack?.lyrics) {
+        setCurrentLyric(null);
+        return;
+    };
     const currentTime = audioRef.current.currentTime;
     
-    const currentLyric = playingTrack.lyrics.find(
+    const activeLyric = playingTrack.lyrics.find(
       (lyric) => currentTime >= lyric.time && currentTime < lyric.time + lyric.duration
     );
 
-    const lyricFaceMapping = ['text2', 'text3', 'text4', 'text5', 'text6'];
-    const baseText: Record<string, string> = {
-        text2: "", text3: "", text4: "", text5: "", text6: "",
-    };
-
-    if (currentLyric) {
-        const faceIndex = currentLyric.wordIndex % lyricFaceMapping.length;
-        baseText[lyricFaceMapping[faceIndex]] = currentLyric.word;
+    if (activeLyric) {
+        if (!currentLyric || currentLyric.time !== activeLyric.time) {
+            setCurrentLyric(activeLyric);
+        }
+    } else if (currentLyric) {
+        // We've passed the last lyric, but the song hasn't ended.
+        // We can choose to clear it, or let it linger. Let's clear it.
+        if(currentTime > playingTrack.lyrics[playingTrack.lyrics.length - 1].time + playingTrack.lyrics[playingTrack.lyrics.length - 1].duration) {
+          setCurrentLyric(null);
+        }
     }
-    
-    setCustomization(prev => ({ ...prev, ...baseText }));
   };
 
   const handleTrackSelect = (track: Track) => {
@@ -97,6 +102,7 @@ export default function Home() {
     audioRef.current.addEventListener('ended', () => {
       setIsPlaying(false);
       setPlayingTrack(null);
+      setCurrentLyric(null);
       setCustomization(prev => ({
         ...prev, 
         animation: 'pulse',
@@ -162,7 +168,15 @@ export default function Home() {
         />
       </Sheet>
 
-      {!isPlaying && <LandingContent 
+      {currentLyric && (
+        <SyncedLyrics 
+            key={currentLyric.time} // Force re-render for animation
+            lyrics={playingTrack?.lyrics || []} 
+            currentLyric={currentLyric} 
+        />
+      )}
+
+      {!isPlaying && !playingTrack && <LandingContent 
         onTrackSelect={handleTrackSelect}
         playingTrack={playingTrack}
         isPlaying={isPlaying}
