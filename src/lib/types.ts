@@ -8,7 +8,6 @@ export type CubeCustomization = {
   faceColor6: string;
   edgeStyle: 'sharp' | 'round' | 'bevel';
   materialStyle: 'solid' | 'wireframe' | 'cartoon' | 'realist' | 'draw' | 'quantum dist';
-  wireframe: boolean; // This can be deprecated in favor of materialStyle
   roundness: number;
   background: 'snow' | 'particles' | 'image' | 'video';
   particleColor1: string;

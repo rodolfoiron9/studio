@@ -140,9 +140,13 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
         cameraRef.current.add(listener);
         const audio = new THREE.Audio(listener);
         try {
-            audio.setMediaElementSource(audioElement);
-            audioAnalyserRef.current = new THREE.AudioAnalyser(audio, 32);
+            // Check if a source is already connected
+            if (!audio.source) {
+                audio.setMediaElementSource(audioElement);
+                audioAnalyserRef.current = new THREE.AudioAnalyser(audio, 32);
+            }
         } catch (e) {
+             console.error("Error setting up audio source:", e);
             // Error is expected on hot reloads, we can ignore it.
             // A more robust solution might check if the context is already connected.
         }
@@ -246,6 +250,18 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
       mat.color.set(faceColors[i]);
       mat.wireframe = customization.materialStyle === 'wireframe';
       
+      switch (customization.materialStyle) {
+          case 'cartoon':
+              mat.flatShading = true;
+              break;
+          case 'realist':
+               mat.flatShading = false;
+               break;
+          default:
+              mat.flatShading = false;
+              break;
+      }
+
       const canvas = textCanvasesRef.current[i];
       const context = canvas.getContext('2d');
       if (context) {
