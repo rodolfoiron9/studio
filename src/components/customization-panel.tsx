@@ -86,7 +86,7 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
                         {faceColorKeys.map((key, index) => (
                             <div key={key} className="relative">
                                 <Input type="color" name={key} id={key} value={localCustomization[key] as string} onChange={handleInputChange} className="h-12 w-full p-1"/>
-                                <Label htmlFor={key} className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-white mix-blend-difference pointer-events-none">Face {index+1}</Label>
+                                <Label htmlFor={key} className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-foreground pointer-events-none">Face {index+1}</Label>
                             </div>
                         ))}
                     </div>
@@ -210,7 +210,7 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
                         {particleColorKeys.map((key, index) => (
                             <div key={key} className="relative">
                                 <Input type="color" name={key} id={key} value={localCustomization[key] as string} onChange={handleInputChange} className="h-12 w-full p-1"/>
-                                <Label htmlFor={key} className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-white mix-blend-difference pointer-events-none">Color {index+1}</Label>
+                                <Label htmlFor={key} className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-foreground pointer-events-none">Color {index+1}</Label>
                             </div>
                         ))}
                     </div>
