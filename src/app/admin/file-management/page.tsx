@@ -4,7 +4,7 @@
 import { useState, useEffect, useTransition } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Music, Image as ImageIcon, FileJson, UploadCloud, MoreVertical, FileText, Trash2, Download, Pencil, Loader, RefreshCw, Video } from "lucide-react";
+import { Music, Image as ImageIcon, FileJson, UploadCloud, MoreVertical, FileText, Trash2, Download, Pencil, Loader, RefreshCw, Video, Folder } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
