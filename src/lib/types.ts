@@ -37,3 +37,12 @@ export type Track = {
   audioSrc: string;
   lyrics: Lyric[];
 };
+
+export type ManagedFile = {
+    name: string;
+    path: string;
+    url: string;
+    type: 'image' | 'audio' | 'video' | 'json' | 'other';
+    size: number;
+    createdAt: string;
+};

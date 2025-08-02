@@ -9,7 +9,10 @@ import { generateAlbumArt } from "@/ai/flows/generate-album-art";
 import { generateMarketingCopy } from "@/ai/flows/generate-marketing-copy";
 import { manageData } from "@/ai/flows/manage-data";
 import { importTrack } from "@/ai/flows/import-track";
-import {promises as fs} from 'fs';
+import { listFiles as listStorageFiles, deleteFile as deleteStorageFile } from "@/ai/flows/manage-files";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { getApp } from "firebase/app";
+import { promises as fs } from 'fs';
 import path from 'path';
 
 type ActionResult<T> = { success: true; data: T } | { success: false; error: string };
@@ -145,7 +148,6 @@ export async function saveApiKeys(keys: Record<string, string>): Promise<ActionR
     }
 }
 
-
 export async function updateTheme(colors: Record<string, string>): Promise<ActionResult<string>> {
   try {
     const cssPath = path.join(process.cwd(), 'src', 'app', 'globals.css');
@@ -163,4 +165,25 @@ export async function updateTheme(colors: Record<string, string>): Promise<Actio
     console.error("Theme update failed:", error);
     return { success: false, error: `Failed to update theme: ${error.message}` };
   }
+}
+
+
+export async function listFiles(): Promise<ActionResult<Awaited<ReturnType<typeof listStorageFiles>>>> {
+    try {
+        const result = await listStorageFiles();
+        return { success: true, data: result };
+    } catch (error: any) {
+        console.error("File listing failed:", error);
+        return { success: false, error: `Failed to list files: ${error.message}` };
+    }
+}
+
+export async function deleteFile(path: string): Promise<ActionResult<string>> {
+    try {
+        await deleteStorageFile({ path });
+        return { success: true, data: "File deleted successfully." };
+    } catch (error: any) {
+        console.error("File deletion failed:", error);
+        return { success: false, error: `Failed to delete file: ${error.message}` };
+    }
 }

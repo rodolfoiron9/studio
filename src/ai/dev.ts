@@ -9,3 +9,4 @@ import '@/ai/flows/generate-album-art.ts';
 import '@/ai/flows/generate-marketing-copy.ts';
 import '@/ai/flows/manage-data.ts';
 import '@/ai/flows/import-track.ts';
+import '@/ai/flows/manage-files.ts';
