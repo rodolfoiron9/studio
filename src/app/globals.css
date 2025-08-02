@@ -21,7 +21,7 @@
     --secondary-foreground: 240 6% 10%;
 
     --muted: 240 5% 90%;
-    --muted-foreground: 240 4% 46%;
+    --muted-foreground: 240 4% 30%;
 
     --accent: 282.8 100% 61.4%; /* Ultra Violet */
     --accent-foreground: 0 0% 100%;
@@ -65,7 +65,7 @@
     --secondary-foreground: 240 100% 99%;
 
     --muted: 234.8 64.1% 20%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted-foreground: 240 5% 75%;
 
     --accent: 282.8 100% 61.4%; /* Ultra Violet */
     --accent-foreground: 234.8 64.1% 10%;
