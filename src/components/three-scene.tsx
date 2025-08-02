@@ -283,8 +283,8 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
       if (context) {
         context.clearRect(0, 0, canvas.width, canvas.height);
         
-        // Don't draw text if the material is glass
-        if (customization.materialStyle !== 'glass') {
+        // Don't draw text if the material is glass, as it causes rendering issues.
+        if (customization.materialStyle !== 'glass' && faceTexts[i]) {
             context.font = 'bold 40px "Space Grotesk"';
             context.textAlign = 'center';
             context.textBaseline = 'middle';
@@ -295,10 +295,9 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
         if (!mat.map) {
           mat.map = new THREE.CanvasTexture(canvas);
         } else {
-          mat.map.dispose(); 
-          mat.map = new THREE.CanvasTexture(canvas);
+          // If a map exists, we need to tell Three.js that its content has changed.
+          mat.map.needsUpdate = true;
         }
-        mat.map.needsUpdate = true;
       }
        mat.needsUpdate = true;
     });
@@ -325,7 +324,7 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
       }
     }
 
-  }, [customization]);
+  }, [customization, audioElement]);
 
   return <div ref={mountRef} className="absolute inset-0 z-0" />;
 }
