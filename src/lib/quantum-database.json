@@ -1,1 +1,140 @@
-{}
+{
+  "updatedAt": "2025-08-02T11:20:53.163Z",
+  "source": "Project Scan",
+  "project": {
+    "name": "nextn",
+    "version": "0.1.0",
+    "dependencies": [
+      "@genkit-ai/googleai",
+      "@genkit-ai/next",
+      "@hookform/resolvers",
+      "@radix-ui/react-accordion",
+      "@radix-ui/react-alert-dialog",
+      "@radix-ui/react-avatar",
+      "@radix-ui/react-checkbox",
+      "@radix-ui/react-collapsible",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-label",
+      "@radix-ui/react-menubar",
+      "@radix-ui/react-popover",
+      "@radix-ui/react-progress",
+      "@radix-ui/react-radio-group",
+      "@radix-ui/react-scroll-area",
+      "@radix-ui/react-select",
+      "@radix-ui/react-separator",
+      "@radix-ui/react-slider",
+      "@radix-ui/react-slot",
+      "@radix-ui/react-switch",
+      "@radix-ui/react-tabs",
+      "@radix-ui/react-toast",
+      "@radix-ui/react-tooltip",
+      "class-variance-authority",
+      "clsx",
+      "date-fns",
+      "dotenv",
+      "embla-carousel-react",
+      "firebase",
+      "framer-motion",
+      "genkit",
+      "lucide-react",
+      "next",
+      "patch-package",
+      "react",
+      "react-day-picker",
+      "react-dom",
+      "react-hook-form",
+      "recharts",
+      "tailwind-merge",
+      "tailwindcss-animate",
+      "three",
+      "wav",
+      "zod"
+    ]
+  },
+  "album": {
+    "trackCount": 20,
+    "tracks": [
+      {
+        "title": "Rising Above",
+        "duration": "3:45"
+      },
+      {
+        "title": "Breaking the Mould",
+        "duration": "4:12"
+      },
+      {
+        "title": "Samba B",
+        "duration": "3:58"
+      },
+      {
+        "title": "Fake Games",
+        "duration": "4:05"
+      },
+      {
+        "title": "Btz in the House",
+        "duration": "3:30"
+      },
+      {
+        "title": "Love Feels Fake",
+        "duration": "4:20"
+      },
+      {
+        "title": "Tonight",
+        "duration": "3:55"
+      },
+      {
+        "title": "I Found",
+        "duration": "4:10"
+      },
+      {
+        "title": "Action",
+        "duration": "3:48"
+      },
+      {
+        "title": "Shadows in the Rhythm",
+        "duration": "4:02"
+      },
+      {
+        "title": "Flow Do Tigre",
+        "duration": "3:00"
+      },
+      {
+        "title": "Lost in the Secret",
+        "duration": "3:33"
+      },
+      {
+        "title": "Counting My Blessing",
+        "duration": "4:01"
+      },
+      {
+        "title": "Gol",
+        "duration": "3:15"
+      },
+      {
+        "title": "Precision",
+        "duration": "3:59"
+      },
+      {
+        "title": "Alone",
+        "duration": "4:21"
+      },
+      {
+        "title": "Echo of the Soul",
+        "duration": "3:50"
+      },
+      {
+        "title": "Brilho Claro",
+        "duration": "3:44"
+      },
+      {
+        "title": "Tables Turns",
+        "duration": "4:08"
+      },
+      {
+        "title": "The Rain",
+        "duration": "3:56"
+      }
+    ]
+  }
+}
