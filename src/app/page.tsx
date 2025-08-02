@@ -10,6 +10,7 @@ import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Settings, Loader } from "lucide-react";
 import { SyncedLyrics } from "@/components/synced-lyrics";
+import { Header } from "@/components/header";
 
 
 export default function Home() {
@@ -29,7 +30,6 @@ export default function Home() {
     faceColor5: "#0a0a1a",
     faceColor6: "#0a0a1a",
     edgeStyle: "round",
-    wireframe: true,
     materialStyle: 'solid',
     roundness: 0.2,
     background: "snow",
@@ -153,6 +153,8 @@ export default function Home() {
         audioElement={audioRef.current}
       />
       
+      <Header />
+
       <Sheet>
         <SheetTrigger asChild>
           <Button

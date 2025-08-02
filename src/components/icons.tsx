@@ -1,6 +1,7 @@
+
 "use client";
 
-import { Music, Disc, User, Play, Pause, Wand2 } from 'lucide-react';
+import { Music, Disc, User, Play, Pause, Wand2, UserCog } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export const MusicIcon = ({ className }: { className?: string }) => (
@@ -25,4 +26,8 @@ export const PauseIcon = ({ className }: { className?: string }) => (
 
 export const MagicWandIcon = ({ className }: { className?: string }) => (
   <Wand2 className={cn('', className)} />
+);
+
+export const AdminIcon = ({ className }: { className?: string }) => (
+  <UserCog className={cn('glowing-icon', className)} />
 );

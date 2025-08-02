@@ -9,7 +9,6 @@ import { ALBUM_TRACKS } from '@/lib/constants';
 import type { Track } from '@/lib/types';
 import { PlayIcon, PauseIcon, UserIcon, MusicIcon } from '@/components/icons';
 import { Separator } from './ui/separator';
-import { Youtube, Dribbble, Twitter } from 'lucide-react'; // Placeholder icons
 import { AnimatePresence, motion } from 'framer-motion';
 
 interface LandingContentProps {
@@ -18,54 +17,27 @@ interface LandingContentProps {
   isPlaying: boolean;
 }
 
-const SocialLinks = () => (
-    <div className="flex justify-center gap-4 mt-4">
-        <Button variant="ghost" size="icon" asChild>
-            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">
-                <Youtube className="h-6 w-6 text-red-600"/>
-                <span className="sr-only">YouTube</span>
-            </a>
-        </Button>
-        <Button variant="ghost" size="icon" asChild>
-            <a href="https://soundcloud.com" target="_blank" rel="noopener noreferrer">
-                {/* Using Dribble as placeholder for SoundCloud */}
-                <Dribbble className="h-6 w-6 text-orange-500"/>
-                <span className="sr-only">SoundCloud</span>
-            </a>
-        </Button>
-        <Button variant="ghost" size="icon" asChild>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-                <Twitter className="h-6 w-6 text-blue-400"/>
-                <span className="sr-only">Twitter</span>
-            </a>
-        </Button>
-    </div>
-)
-
 export function LandingContent({ onTrackSelect, playingTrack, isPlaying }: LandingContentProps) {
   
   return (
      <AnimatePresence>
         <motion.div 
             id="landing-content" 
-            className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-between p-4 md:p-8"
+            className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center p-4 md:p-8"
             initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.5 } }}
         >
-            <header className="w-full max-w-6xl text-center">
+            <div className="w-full max-w-6xl text-center mb-8">
                 <h1 className="font-headline text-5xl font-bold tracking-tighter text-white drop-shadow-lg md:text-7xl">
                 RudyBtz
                 </h1>
                 <p className="mt-2 text-xl text-accent drop-shadow-md md:text-2xl">
                 Making Magic - The Album
                 </p>
-                <div className="pointer-events-auto">
-                <SocialLinks />
-                </div>
-            </header>
+            </div>
 
-            <div className="grid h-full w-full max-w-6xl grid-cols-1 gap-4 pt-8 md:grid-cols-3 md:pt-0">
+            <div className="grid h-full w-full max-w-6xl grid-cols-1 gap-4 md:grid-cols-3">
                 <div className="pointer-events-auto md:col-span-1">
                 <Card className="h-full bg-background/50 backdrop-blur-sm">
                     <CardHeader>
@@ -79,7 +51,7 @@ export function LandingContent({ onTrackSelect, playingTrack, isPlaying }: Landi
                         <p className="text-sm text-foreground/80">
                         Originally from Brazil and now based in the UK, RudyBtz cultivates a unique sonic identity by fusing Drum and Bass, Trap, Samba, Reggae, Funk, and UK Dark Drill.
                         <br /><br />
-                        This transatlantic transition is a foundational element influencing their musical output, skillfully amalgamating Brazilian roots with the UK&apos;s vibrant music scene. The result is a sound that is undeniably fresh and innovative, pushing the boundaries of contemporary urban music.
+                        This transatlantic transition is a foundational element influencing their musical output, skillfully amalgamating Brazilian roots with the UK's vibrant music scene. The result is a sound that is undeniably fresh and innovative, pushing the boundaries of contemporary urban music.
                         </p>
                     </ScrollArea>
                     </CardContent>
