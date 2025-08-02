@@ -251,21 +251,30 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
     (cube.material as THREE.MeshStandardMaterial[]).forEach((mat, i) => {
       mat.color.set(faceColors[i]);
       
+      // Default properties
+      mat.transparent = false;
+      mat.opacity = 1.0;
+      mat.metalness = 0.1;
+      mat.roughness = 0.5;
+      mat.wireframe = false;
+      mat.flatShading = false;
+      
       switch (customization.materialStyle) {
           case 'cartoon':
               mat.flatShading = true;
-              mat.wireframe = false;
               break;
-          case 'realist':
-               mat.flatShading = false;
-               mat.wireframe = false;
-               break;
           case 'wireframe':
-                mat.wireframe = true;
-                break;
-          default:
-              mat.flatShading = false;
-              mat.wireframe = false;
+              mat.wireframe = true;
+              break;
+          case 'glass':
+              mat.transparent = true;
+              mat.opacity = 0.3;
+              mat.metalness = 0.2;
+              mat.roughness = 0.1;
+              break;
+          case 'metallic':
+              mat.metalness = 0.9;
+              mat.roughness = 0.2;
               break;
       }
 
@@ -273,11 +282,15 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
       const context = canvas.getContext('2d');
       if (context) {
         context.clearRect(0, 0, canvas.width, canvas.height);
-        context.font = 'bold 40px "Space Grotesk"';
-        context.textAlign = 'center';
-        context.textBaseline = 'middle';
-        context.fillStyle = getLuminance(faceColors[i]) > 0.5 ? '#000000' : '#FFFFFF';
-        context.fillText(faceTexts[i], canvas.width / 2, canvas.height / 2);
+        
+        // Don't draw text if the material is glass
+        if (customization.materialStyle !== 'glass') {
+            context.font = 'bold 40px "Space Grotesk"';
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.fillStyle = getLuminance(faceColors[i]) > 0.5 ? '#000000' : '#FFFFFF';
+            context.fillText(faceTexts[i], canvas.width / 2, canvas.height / 2);
+        }
         
         if (!mat.map) {
           mat.map = new THREE.CanvasTexture(canvas);

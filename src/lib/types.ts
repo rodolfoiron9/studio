@@ -7,7 +7,7 @@ export type CubeCustomization = {
   faceColor5: string;
   faceColor6: string;
   edgeStyle: 'sharp' | 'round' | 'bevel';
-  materialStyle: 'solid' | 'wireframe' | 'cartoon' | 'realist' | 'draw' | 'quantum dist';
+  materialStyle: 'solid' | 'wireframe' | 'cartoon' | 'realist' | 'draw' | 'quantum dist' | 'glass' | 'metallic';
   roundness: number;
   background: 'snow' | 'particles' | 'image' | 'video';
   particleColor1: string;

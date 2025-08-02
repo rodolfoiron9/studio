@@ -132,7 +132,7 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
             <div className="space-y-4">
                 <Label>Material Style</Label>
                 <RadioGroup value={localCustomization.materialStyle || 'solid'} onValueChange={(value) => handleValueChange('materialStyle', value)} className="grid grid-cols-3 gap-2">
-                    {['solid', 'wireframe', 'cartoon', 'realist', 'draw', 'quantum dist'].map(style => (
+                    {['solid', 'wireframe', 'cartoon', 'realist', 'draw', 'quantum dist', 'glass', 'metallic'].map(style => (
                          <Label key={style} htmlFor={style} className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary capitalize">
                             <RadioGroupItem value={style} id={style} className="sr-only" />
                             {style}
