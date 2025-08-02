@@ -55,14 +55,12 @@ export default function DatabasePage() {
     }
 
     useEffect(() => {
-        if (scrollAreaRef.current) {
-            const scrollElement = scrollAreaRef.current.querySelector('div');
-             if (scrollElement) {
-                scrollElement.parentElement?.scrollTo({
-                    top: scrollElement.scrollHeight,
-                    behavior: 'smooth',
-                });
-            }
+        const scrollViewport = scrollAreaRef.current?.querySelector('div[data-radix-scroll-area-viewport]');
+        if (scrollViewport) {
+            scrollViewport.scrollTo({
+                top: scrollViewport.scrollHeight,
+                behavior: 'smooth',
+            });
         }
     }, [conversation]);
     
@@ -95,10 +93,10 @@ export default function DatabasePage() {
                                        </Avatar>
                                    )}
                                    <div className={cn(
-                                       "max-w-prose p-3 rounded-lg", 
+                                       "max-w-prose p-3 rounded-lg prose prose-sm prose-invert prose-p:my-0", 
                                        message.role === 'user' ? "bg-primary text-primary-foreground" : "bg-muted"
                                     )}>
-                                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                                        <p className="whitespace-pre-wrap font-sans">{message.content}</p>
                                    </div>
                                     {message.role === 'user' && (
                                        <Avatar className="w-8 h-8 border">
