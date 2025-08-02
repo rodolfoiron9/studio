@@ -87,6 +87,53 @@ export async function runDataAgent(query: string): Promise<ActionResult<Awaited<
     }
 }
 
+export async function saveApiKeys(keys: Record<string, string>): Promise<ActionResult<string>> {
+    try {
+        const envPath = path.join(process.cwd(), '.env');
+        let envContent = "";
+        try {
+            envContent = await fs.readFile(envPath, 'utf8');
+        } catch (error: any) {
+            if (error.code !== 'ENOENT') { // ENOENT means file doesn't exist, which is fine
+                throw error;
+            }
+        }
+
+        const lines = envContent.split('\n');
+        const newLines: string[] = [];
+        const keysToUpdate = { ...keys };
+
+        lines.forEach(line => {
+            if (line.trim() === '') {
+                return;
+            }
+            let keyFound = false;
+            for (const key in keysToUpdate) {
+                if (line.startsWith(`${key}=`)) {
+                    newLines.push(`${key}=${keysToUpdate[key]}`);
+                    delete keysToUpdate[key];
+                    keyFound = true;
+                    break;
+                }
+            }
+            if (!keyFound) {
+                newLines.push(line);
+            }
+        });
+
+        for (const key in keysToUpdate) {
+             newLines.push(`${key}=${keysToUpdate[key]}`);
+        }
+        
+        await fs.writeFile(envPath, newLines.join('\n'), 'utf8');
+        
+        return { success: true, data: "API keys saved successfully. Please restart the server for changes to take effect." };
+    } catch (error: any) {
+        console.error("API key saving failed:", error);
+        return { success: false, error: `Failed to save API keys: ${error.message}` };
+    }
+}
+
 
 export async function updateTheme(colors: Record<string, string>): Promise<ActionResult<string>> {
   try {
@@ -94,8 +141,6 @@ export async function updateTheme(colors: Record<string, string>): Promise<Actio
     let cssContent = await fs.readFile(cssPath, 'utf8');
     
     Object.entries(colors).forEach(([name, value]) => {
-      // Regex to find CSS variables like --background: 234.8 64.1% 10%;
-      // It captures the variable name and its HSL value.
       const regex = new RegExp(`--${name}:\\s*([\\d.]+\\s+[\\d.]+%\\s+[\\d.]+)%`, 'g');
       cssContent = cssContent.replace(regex, `--${name}: ${value}`);
     });

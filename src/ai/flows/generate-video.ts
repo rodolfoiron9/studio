@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI agent that generates background videos using Veo.
@@ -36,7 +37,7 @@ async function downloadVideo(video: any): Promise<string> {
     const fetch = (await import('node-fetch')).default;
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      throw new Error('GEMINI_API_KEY environment variable not set');
+      throw new Error('GEMINI_API_KEY environment variable not set. Please set it in the API Keys page.');
     }
     const videoDownloadResponse = await fetch(
       `${video.media!.url}&key=${apiKey}`
@@ -49,8 +50,9 @@ async function downloadVideo(video: any): Promise<string> {
       throw new Error('Failed to fetch video');
     }
 
-    const buffer = await videoDownloadResponse.buffer();
-    return `data:video/mp4;base64,${buffer.toString('base64')}`;
+    const buffer = await videoDownloadResponse.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString('base64');
+    return `data:video/mp4;base64,${base64}`;
 }
 
 
