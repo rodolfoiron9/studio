@@ -21,8 +21,8 @@ export type CubeCustomization = {
   text5: string;
   text6: string;
   animation: string;
-  environmentImage?: string;
-  environmentVideo?: string;
+  environmentImage: string;
+  environmentVideo: string;
 };
 
 export type Lyric = {

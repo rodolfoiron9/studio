@@ -44,6 +44,7 @@ export default function Home() {
     text6: "",
     animation: "pulse",
     environmentImage: "",
+    environmentVideo: "",
   });
 
   const handleTimeUpdate = () => {
@@ -136,7 +137,7 @@ export default function Home() {
 
   return (
     <main className="relative h-screen w-screen overflow-hidden">
-        {customization.background === 'video' && (
+        {customization.background === 'video' && customization.environmentVideo && (
             <video 
                 ref={videoRef}
                 className="absolute inset-0 h-full w-full object-cover z-[-1]"
@@ -144,6 +145,7 @@ export default function Home() {
                 muted
                 autoPlay
                 playsInline
+                src={customization.environmentVideo}
             />
         )}
       <ThreeScene 

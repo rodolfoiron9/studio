@@ -48,39 +48,13 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
         </SheetDescription>
       </SheetHeader>
       <Tabs defaultValue="appearance" className="mt-4">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="albumArt">Album Art</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
           <TabsTrigger value="text">3D Text</TabsTrigger>
           <TabsTrigger value="environment">Environment</TabsTrigger>
           <TabsTrigger value="ai">AI Tools</TabsTrigger>
         </TabsList>
         <ScrollArea className="h-[calc(100vh-150px)] pr-4">
-          <TabsContent value="albumArt" className="space-y-6 pt-4">
-              <div className="space-y-2">
-                <Label>Music Upload</Label>
-                <div className="flex items-center gap-2">
-                  <Input type="file" accept="audio/*" className="flex-grow"/>
-                  <Button size="icon"><Upload className="h-4 w-4"/></Button>
-                </div>
-                <p className="text-xs text-muted-foreground">Upload a track to associate with a cube design.</p>
-              </div>
-               <div className="space-y-2">
-                <Label>AI Album Art Generator</Label>
-                 <Button className="w-full">Generate Album Art</Button>
-                <p className="text-xs text-muted-foreground">Let AI create a unique cover for your track.</p>
-              </div>
-               <div className="space-y-2">
-                <Label>Saved Presets</Label>
-                 <div className="grid grid-cols-3 gap-2 h-32 border rounded-md p-2">
-                    <div className="bg-muted flex items-center justify-center text-xs text-muted-foreground">Empty</div>
-                    <div className="bg-muted flex items-center justify-center text-xs text-muted-foreground">Empty</div>
-                    <div className="bg-muted flex items-center justify-center text-xs text-muted-foreground">Empty</div>
-                 </div>
-                <p className="text-xs text-muted-foreground">Your saved AI-generated presets will appear here.</p>
-              </div>
-          </TabsContent>
-
           <TabsContent value="appearance" className="space-y-6 pt-4">
             <div className="space-y-2">
                 <Label>Face Style</Label>
@@ -221,5 +195,3 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
     </SheetContent>
   );
 }
-
-    

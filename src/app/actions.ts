@@ -100,13 +100,9 @@ export async function updateTheme(colors: Record<string, string>): Promise<Actio
       cssContent = cssContent.replace(regex, `--${name}: ${value}`);
     });
     
-    // In a real app with write access, you'd uncomment the next line:
-    // await fs.writeFile(cssPath, cssContent, 'utf8');
+    await fs.writeFile(cssPath, cssContent, 'utf8');
     
-    // For this prototype, we'll log what would be written.
-    console.log("Simulating theme update. New CSS content for globals.css would be written.");
-    
-    return { success: true, data: "Theme updated successfully (simulation)." };
+    return { success: true, data: "Theme updated successfully." };
   } catch (error: any) {
     console.error("Theme update failed:", error);
     return { success: false, error: `Failed to update theme: ${error.message}` };

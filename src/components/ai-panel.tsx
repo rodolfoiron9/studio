@@ -81,11 +81,11 @@ export function AiPanel({ setCustomization, currentCustomization }: AiPanelProps
             if (result.success && result.data) {
                 const { text1, text2, text3, text4, text5, text6, ...rest } = result.data;
                 const preset = {
+                    ...currentCustomization,
                     ...rest,
                     text1: text1 || "", text2: text2 || "", text3: text3 || "",
                     text4: text4 || "", text5: text5 || "", text6: text6 || "",
                     animation: "pulse", // default animation
-                    environmentImage: currentCustomization.environmentImage,
                 }
                 setCustomization(preset);
                 toast({ title: "Preset Generated!", description: "The cube has been updated with a new AI preset." });
@@ -177,6 +177,7 @@ export function AiPanel({ setCustomization, currentCustomization }: AiPanelProps
             text1: text1 || "", text2: text2 || "", text3: text3 || "",
             text4: text4 || "", text5: text5 || "", text6: text6 || "",
             animation: "pulse",
+            environmentVideo: "",
         }
         
         const envResult = await runEnvironmentGenerator("A mystical forest with glowing particles and ancient ruins");
