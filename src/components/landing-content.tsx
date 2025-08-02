@@ -32,7 +32,7 @@ export function LandingContent({ onTrackSelect, playingTrack, isPlaying }: Landi
                 <h1 className="font-headline text-5xl font-bold tracking-tighter text-white drop-shadow-lg md:text-7xl text-3d">
                 RudyBtz
                 </h1>
-                <p className="mt-2 text-xl text-accent drop-shadow-md md:text-2xl">
+                <p className="mt-2 text-xl text-accent drop-shadow-md md:text-2xl text-3d">
                 Making Magic - The Album
                 </p>
             </div>
