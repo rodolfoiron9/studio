@@ -8,6 +8,7 @@ import { generateVideo } from "@/ai/flows/generate-video";
 import { generateAlbumArt } from "@/ai/flows/generate-album-art";
 import { generateMarketingCopy } from "@/ai/flows/generate-marketing-copy";
 import { manageData } from "@/ai/flows/manage-data";
+import { importTrack } from "@/ai/flows/import-track";
 import {promises as fs} from 'fs';
 import path from 'path';
 
@@ -84,6 +85,16 @@ export async function runDataAgent(query: string): Promise<ActionResult<Awaited<
     } catch (error: any) {
         console.error("Data agent failed:", error);
         return { success: false, error: `Data agent failed: ${error.message}` };
+    }
+}
+
+export async function runTrackImporter(url: string): Promise<ActionResult<Awaited<ReturnType<typeof importTrack>>>> {
+    try {
+        const result = await importTrack({ url });
+        return { success: true, data: result };
+    } catch (error: any) {
+        console.error("Track importer failed:", error);
+        return { success: false, error: `Track importer failed: ${error.message}` };
     }
 }
 

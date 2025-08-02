@@ -1,12 +1,16 @@
 
 "use client";
 
+import { useState, useTransition } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Link, Youtube, Music } from "lucide-react";
+import { Link, Youtube, Music, Loader, Info } from "lucide-react";
+import { runTrackImporter } from "@/app/actions";
+import type { ImportTrackOutput } from "@/ai/flows/import-track";
+import Image from "next/image";
 
 // A placeholder for the SoundCloud icon
 const SoundCloudIcon = () => (
@@ -27,8 +31,10 @@ const SpotifyIcon = () => (
 
 export default function LinkImporterPage() {
     const { toast } = useToast();
+    const [isPending, startTransition] = useTransition();
+    const [importedData, setImportedData] = useState<ImportTrackOutput | null>(null);
 
-    const handleImport = (service: string) => (event: React.FormEvent<HTMLFormElement>) => {
+    const handleImport = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const form = event.target as HTMLFormElement;
         const input = form.elements.namedItem('import-url') as HTMLInputElement;
@@ -39,14 +45,19 @@ export default function LinkImporterPage() {
             return;
         }
 
-        // In a real application, this would call a server action to parse the URL
-        // and fetch track data from the respective service's API.
-        toast({
-            title: `Importing from ${service}...`,
-            description: `URL: ${url}`,
+        setImportedData(null);
+        startTransition(async () => {
+            toast({ title: "Importing Track...", description: "The AI agent is fetching data for the URL." });
+            const result = await runTrackImporter(url);
+
+            if (result.success && result.data) {
+                setImportedData(result.data);
+                toast({ title: "Import Successful!", description: `Data for "${result.data.title}" has been fetched.` });
+            } else {
+                toast({ variant: 'destructive', title: "Error", description: result.error });
+            }
         });
         
-        // Reset form for good measure
         input.value = "";
     };
     
@@ -55,67 +66,114 @@ export default function LinkImporterPage() {
             <h1 className="text-3xl font-bold mb-4 font-headline">Track Importer</h1>
             <p className="text-muted-foreground mb-8">Import song data directly from popular music services by pasting a link.</p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {/* Spotify Importer */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-3">
-                            <SpotifyIcon /> Spotify Importer
-                        </CardTitle>
-                        <CardDescription>Paste a link to a Spotify track.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleImport('Spotify')} className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="spotify-url">Spotify Track URL</Label>
-                                <Input id="spotify-url" name="import-url" placeholder="https://open.spotify.com/track/..." />
-                            </div>
-                            <Button type="submit" className="w-full">
-                                <Link className="mr-2"/> Import from Spotify
-                            </Button>
-                        </form>
-                    </CardContent>
-                </Card>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-8">
+                        {/* Spotify Importer */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-3"><SpotifyIcon /> Spotify Importer</CardTitle>
+                                <CardDescription>Paste a link to a Spotify track.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <form onSubmit={handleImport} className="space-y-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="spotify-url">Spotify Track URL</Label>
+                                        <Input id="spotify-url" name="import-url" placeholder="https://open.spotify.com/track/..." disabled={isPending} />
+                                    </div>
+                                    <Button type="submit" className="w-full" disabled={isPending}>
+                                        {isPending ? <Loader className="animate-spin" /> : <Link className="mr-2"/>}
+                                        Import from Spotify
+                                    </Button>
+                                </form>
+                            </CardContent>
+                        </Card>
 
-                {/* SoundCloud Importer */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-3">
-                           <SoundCloudIcon /> SoundCloud Importer
-                        </CardTitle>
-                        <CardDescription>Paste a link to a SoundCloud track.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleImport('SoundCloud')} className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="soundcloud-url">SoundCloud Track URL</Label>
-                                <Input id="soundcloud-url" name="import-url" placeholder="https://soundcloud.com/user/track" />
-                            </div>
-                            <Button type="submit" className="w-full">
-                                <Link className="mr-2"/> Import from SoundCloud
-                            </Button>
-                        </form>
-                    </CardContent>
-                </Card>
+                        {/* SoundCloud Importer */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-3"><SoundCloudIcon /> SoundCloud Importer</CardTitle>
+                                <CardDescription>Paste a link to a SoundCloud track.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <form onSubmit={handleImport} className="space-y-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="soundcloud-url">SoundCloud Track URL</Label>
+                                        <Input id="soundcloud-url" name="import-url" placeholder="https://soundcloud.com/user/track" disabled={isPending}/>
+                                    </div>
+                                    <Button type="submit" className="w-full" disabled={isPending}>
+                                        {isPending ? <Loader className="animate-spin" /> : <Link className="mr-2"/>}
+                                        Import from SoundCloud
+                                    </Button>
+                                </form>
+                            </CardContent>
+                        </Card>
 
-                {/* YouTube Importer */}
+                        {/* YouTube Importer */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-3"><Youtube /> YouTube Importer</CardTitle>
+                                <CardDescription>Paste a link to a YouTube video.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <form onSubmit={handleImport} className="space-y-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="youtube-url">YouTube Video URL</Label>
+                                        <Input id="youtube-url" name="import-url" placeholder="https://www.youtube.com/watch?v=..." disabled={isPending}/>
+                                    </div>
+                                    <Button type="submit" className="w-full" disabled={isPending}>
+                                        {isPending ? <Loader className="animate-spin" /> : <Link className="mr-2"/>}
+                                        Import from YouTube
+                                    </Button>
+                                </form>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+
                 <Card>
                     <CardHeader>
-                         <CardTitle className="flex items-center gap-3">
-                           <Youtube /> YouTube Importer
-                        </CardTitle>
-                        <CardDescription>Paste a link to a YouTube video.</CardDescription>
+                        <CardTitle className="flex items-center gap-2"><Info /> Imported Data</CardTitle>
+                        <CardDescription>The data fetched from the provided URL will appear here. You can then add it to your project.</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleImport('YouTube')} className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="youtube-url">YouTube Video URL</Label>
-                                <Input id="youtube-url" name="import-url" placeholder="https://www.youtube.com/watch?v=..." />
+                    <CardContent className="space-y-4">
+                        {isPending && (
+                            <div className="flex flex-col items-center justify-center h-64 gap-2 text-muted-foreground">
+                                <Loader className="h-10 w-10 animate-spin text-primary" />
+                                <p>Fetching data...</p>
                             </div>
-                            <Button type="submit" className="w-full">
-                                <Link className="mr-2"/> Import from YouTube
-                            </Button>
-                        </form>
+                        )}
+                        {!isPending && !importedData && (
+                            <div className="text-center text-muted-foreground h-64 flex flex-col items-center justify-center">
+                                <Info className="h-12 w-12 mx-auto mb-2"/>
+                                <p>Imported track data will be displayed here.</p>
+                            </div>
+                        )}
+                        {importedData && (
+                            <div className="space-y-4">
+                                {importedData.artworkUrl && (
+                                     <Image 
+                                        src={importedData.artworkUrl} 
+                                        alt={`Artwork for ${importedData.title}`} 
+                                        width={200} 
+                                        height={200} 
+                                        className="rounded-md mx-auto"
+                                    />
+                                )}
+                                <div className="space-y-1">
+                                    <h3 className="text-xl font-bold font-headline">{importedData.title}</h3>
+                                    <p className="text-md text-muted-foreground">{importedData.artist}</p>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                    <div><strong className="text-muted-foreground">Album:</strong> {importedData.album || 'N/A'}</div>
+                                    <div><strong className="text-muted-foreground">Duration:</strong> {importedData.duration}</div>
+                                    <div><strong className="text-muted-foreground">Released:</strong> {importedData.releaseDate || 'N/A'}</div>
+                                    <div><strong className="text-muted-foreground">Genre:</strong> {importedData.genre || 'N/A'}</div>
+                                    <div><strong className="text-muted-foreground">Source:</strong> {importedData.source}</div>
+                                </div>
+                                <Button className="w-full">Add to Project Database</Button>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>
