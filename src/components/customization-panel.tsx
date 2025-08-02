@@ -141,6 +141,18 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
                 </RadioGroup>
             </div>
 
+            <div className="space-y-4">
+                <Label>Lyric Display</Label>
+                <RadioGroup value={localCustomization.lyricDisplay || 'underneath'} onValueChange={(value) => handleValueChange('lyricDisplay', value)} className="grid grid-cols-3 gap-2">
+                    {['underneath', 'cube', 'off'].map(style => (
+                         <Label key={style} htmlFor={`lyric-${style}`} className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary capitalize">
+                            <RadioGroupItem value={style} id={`lyric-${style}`} className="sr-only" />
+                            {style}
+                        </Label>
+                    ))}
+                </RadioGroup>
+            </div>
+
           </TabsContent>
           <TabsContent value="text" className="space-y-4 pt-4">
              <div className="space-y-4">

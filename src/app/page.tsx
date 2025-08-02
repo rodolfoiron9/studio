@@ -23,21 +23,21 @@ export default function Home() {
 
 
   const [customization, setCustomization] = React.useState<CubeCustomization>({
-    faceColor1: "#e0f7fa",
-    faceColor2: "#e0f7fa",
-    faceColor3: "#e0f7fa",
-    faceColor4: "#e0f7fa",
-    faceColor5: "#e0f7fa",
-    faceColor6: "#e0f7fa",
+    faceColor1: "#9400D3",
+    faceColor2: "#1A237E",
+    faceColor3: "#7DF9FF",
+    faceColor4: "#9400D3",
+    faceColor5: "#1A237E",
+    faceColor6: "#7DF9FF",
     edgeStyle: "round",
-    materialStyle: 'glass',
+    materialStyle: 'metallic',
     roundness: 0.2,
     background: "snow",
-    particleColor1: "#FFFFFF",
-    particleColor2: "#FFFFFF",
+    particleColor1: "#7DF9FF",
+    particleColor2: "#9400D3",
     particleColor3: "#FFFFFF",
-    text1: "ICE",
-    text2: "COLD",
+    text1: "RUDYBTZ",
+    text2: "MAKING MAGIC",
     text3: "",
     text4: "",
     text5: "",
@@ -45,6 +45,7 @@ export default function Home() {
     animation: "pulse",
     environmentImage: "",
     environmentVideo: "",
+    lyricDisplay: 'underneath',
   });
 
   const handleTimeUpdate = () => {
@@ -119,10 +120,23 @@ export default function Home() {
     if (isPlaying && playingTrack?.lyrics?.length) {
       let lyricIndex = 0;
       setCurrentLyric(playingTrack.lyrics[0]);
+
+      if (customization.lyricDisplay === 'cube') {
+         setCustomization(prev => ({...prev, text1: "", text2: "", text3: "", text4: "", text5: "", text6: ""}));
+      }
+
       lyricInterval = setInterval(() => {
-        lyricIndex++;
         if (lyricIndex < playingTrack.lyrics.length) {
-          setCurrentLyric(playingTrack.lyrics[lyricIndex]);
+          const lyric = playingTrack.lyrics[lyricIndex];
+          setCurrentLyric(lyric);
+
+          if (customization.lyricDisplay === 'cube') {
+             const faceIndex = (lyric.wordIndex % 6) + 1;
+             const textKey = `text${faceIndex}` as keyof CubeCustomization;
+             setCustomization(prev => ({ ...prev, [textKey]: lyric.word }));
+          }
+
+          lyricIndex++;
         } else {
           // End of song simulation
           setIsPlaying(false);
@@ -132,7 +146,7 @@ export default function Home() {
            setCustomization(prev => ({
             ...prev, 
             animation: 'pulse',
-            text1: "ICE", text2: "COLD", text3: "", text4: "", text5: "", text6: ""
+            text1: "RUDYBTZ", text2: "MAKING MAGIC", text3: "", text4: "", text5: "", text6: ""
           }));
         }
       }, 500); // Change lyric every 0.5s for demo
@@ -147,7 +161,7 @@ export default function Home() {
       }
       if(lyricInterval) clearInterval(lyricInterval);
     }
-  }, [isPlaying, playingTrack]);
+  }, [isPlaying, playingTrack, customization.lyricDisplay]);
 
   React.useEffect(() => {
     if (customization.background === 'video' && customization.environmentVideo && videoRef.current) {
@@ -201,7 +215,7 @@ export default function Home() {
         />
       </Sheet>
 
-      {currentLyric && (
+      {customization.lyricDisplay === 'underneath' && currentLyric && (
         <SyncedLyrics 
             key={currentLyric.time} // Force re-render for animation
             lyrics={playingTrack?.lyrics || []} 

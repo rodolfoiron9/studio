@@ -22,6 +22,7 @@ export type CubeCustomization = {
   animation: string;
   environmentImage: string;
   environmentVideo: string;
+  lyricDisplay: 'underneath' | 'cube' | 'off';
 };
 
 export type Lyric = {
