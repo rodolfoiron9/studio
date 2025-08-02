@@ -1,9 +1,10 @@
 
 "use client";
 
+import { useState, useEffect } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { CubeCustomization } from "@/lib/types";
-import { SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
@@ -12,8 +13,9 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import { AiPanel } from "./ai-panel";
-import { Upload } from "lucide-react";
+import { Upload, Save, RotateCcw } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 
 interface CustomizationPanelProps {
   customization: CubeCustomization;
@@ -21,17 +23,34 @@ interface CustomizationPanelProps {
 }
 
 export function CustomizationPanel({ customization, setCustomization }: CustomizationPanelProps) {
+  const [localCustomization, setLocalCustomization] = useState<CubeCustomization>(customization);
+
+  useEffect(() => {
+    // When the external customization changes (e.g. via AI preset),
+    // update the local state to match it.
+    setLocalCustomization(customization);
+  }, [customization]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    setCustomization(prev => ({
+    setLocalCustomization(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
   };
   
   const handleValueChange = (name: string, value: string | number | boolean) => {
-     setCustomization(prev => ({ ...prev, [name]: value }));
+     setLocalCustomization(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSaveChanges = () => {
+    setCustomization(localCustomization);
+    // Maybe show a toast message here
+  };
+  
+  const handleResetChanges = () => {
+    setLocalCustomization(customization);
+    // Maybe show a toast message here
   };
 
   const faceColorKeys: (keyof CubeCustomization)[] = ["faceColor1", "faceColor2", "faceColor3", "faceColor4", "faceColor5", "faceColor6"];
@@ -39,21 +58,21 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
   const textKeys: (keyof CubeCustomization)[] = ["text1", "text2", "text3", "text4", "text5", "text6"];
 
   return (
-    <SheetContent className="w-full md:w-[450px] sm:max-w-none md:max-w-[450px]">
+    <SheetContent className="w-full md:w-[450px] sm:max-w-none md:max-w-[450px] flex flex-col">
       <SheetHeader>
         <SheetTitle>Quantum Cube Customization</SheetTitle>
         <SheetDescription>
-          Craft your unique visual experience. All changes are applied live.
+          Craft your unique visual experience. Click Save to apply changes.
         </SheetDescription>
       </SheetHeader>
-      <Tabs defaultValue="appearance" className="mt-4">
+      <Tabs defaultValue="appearance" className="mt-4 flex-grow flex flex-col">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
           <TabsTrigger value="text">3D Text</TabsTrigger>
           <TabsTrigger value="environment">Environment</TabsTrigger>
           <TabsTrigger value="ai">AI Tools</TabsTrigger>
         </TabsList>
-        <ScrollArea className="h-[calc(100vh-150px)] pr-4">
+        <ScrollArea className="h-[calc(100vh-220px)] pr-4">
           <TabsContent value="appearance" className="space-y-6 pt-4">
             <div className="space-y-2">
                 <Label>Face Style</Label>
@@ -66,7 +85,7 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
                      <div className="grid grid-cols-3 gap-2">
                         {faceColorKeys.map((key, index) => (
                             <div key={key} className="relative">
-                                <Input type="color" name={key} id={key} value={customization[key] as string} onChange={handleInputChange} className="h-12 w-full p-1"/>
+                                <Input type="color" name={key} id={key} value={localCustomization[key] as string} onChange={handleInputChange} className="h-12 w-full p-1"/>
                                 <Label htmlFor={key} className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-white mix-blend-difference pointer-events-none">Face {index+1}</Label>
                             </div>
                         ))}
@@ -87,7 +106,7 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
 
             <div className="space-y-4">
               <Label>Edge Style</Label>
-              <RadioGroup value={customization.edgeStyle} onValueChange={(value) => handleValueChange('edgeStyle', value)} className="grid grid-cols-3 gap-2">
+              <RadioGroup value={localCustomization.edgeStyle} onValueChange={(value) => handleValueChange('edgeStyle', value)} className="grid grid-cols-3 gap-2">
                   <Label htmlFor="sharp" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
                     <RadioGroupItem value="sharp" id="sharp" className="sr-only" />
                     Sharp
@@ -103,16 +122,16 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
               </RadioGroup>
             </div>
 
-            {customization.edgeStyle === 'round' && (
+            {localCustomization.edgeStyle === 'round' && (
                 <div className="space-y-2">
-                    <Label htmlFor="roundness">Roundness: {customization.roundness.toFixed(2)}</Label>
-                    <Slider id="roundness" name="roundness" min={0} max={0.5} step={0.01} value={[customization.roundness]} onValueChange={([val]) => handleValueChange('roundness', val)} />
+                    <Label htmlFor="roundness">Roundness: {localCustomization.roundness.toFixed(2)}</Label>
+                    <Slider id="roundness" name="roundness" min={0} max={0.5} step={0.01} value={[localCustomization.roundness]} onValueChange={([val]) => handleValueChange('roundness', val)} />
                 </div>
             )}
             
             <div className="space-y-4">
                 <Label>Material Style</Label>
-                <RadioGroup value={customization.materialStyle || 'solid'} onValueChange={(value) => handleValueChange('materialStyle', value)} className="grid grid-cols-3 gap-2">
+                <RadioGroup value={localCustomization.materialStyle || 'solid'} onValueChange={(value) => handleValueChange('materialStyle', value)} className="grid grid-cols-3 gap-2">
                     {['solid', 'wireframe', 'cartoon', 'realist', 'draw', 'quantum dist'].map(style => (
                          <Label key={style} htmlFor={style} className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary capitalize">
                             <RadioGroupItem value={style} id={style} className="sr-only" />
@@ -148,14 +167,14 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
             {textKeys.map((key, index) => (
                 <div key={key} className="space-y-1">
                     <Label htmlFor={key} className="text-xs text-muted-foreground">Face {index+1} Text</Label>
-                    <Input id={key} name={key} value={customization[key] as string} onChange={handleInputChange} />
+                    <Input id={key} name={key} value={localCustomization[key] as string} onChange={handleInputChange} />
                 </div>
             ))}
           </TabsContent>
           <TabsContent value="environment" className="space-y-6 pt-4">
             <div className="space-y-4">
                 <Label>Background Style</Label>
-                <RadioGroup value={customization.background} onValueChange={(value) => handleValueChange('background', value)} className="grid grid-cols-3 gap-2">
+                <RadioGroup value={localCustomization.background} onValueChange={(value) => handleValueChange('background', value)} className="grid grid-cols-3 gap-2">
                    {['particles', 'snow', 'image', 'video'].map(style => (
                        <Label key={style} htmlFor={style} className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary capitalize">
                           <RadioGroupItem value={style} id={style} className="sr-only" />
@@ -172,13 +191,13 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
                     ))}
                 </div>
             </div>
-            {customization.background === 'particles' && (
+            {localCustomization.background === 'particles' && (
                 <div className="space-y-2">
                     <Label>Particle Colors</Label>
                     <div className="grid grid-cols-3 gap-2">
                         {particleColorKeys.map((key, index) => (
                             <div key={key} className="relative">
-                                <Input type="color" name={key} id={key} value={customization[key] as string} onChange={handleInputChange} className="h-12 w-full p-1"/>
+                                <Input type="color" name={key} id={key} value={localCustomization[key] as string} onChange={handleInputChange} className="h-12 w-full p-1"/>
                                 <Label htmlFor={key} className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-white mix-blend-difference pointer-events-none">Color {index+1}</Label>
                             </div>
                         ))}
@@ -187,10 +206,21 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
             )}
           </TabsContent>
           <TabsContent value="ai" className="pt-4">
-            <AiPanel setCustomization={setCustomization} currentCustomization={customization} />
+            <AiPanel setCustomization={setCustomization} currentCustomization={localCustomization} />
           </TabsContent>
         </ScrollArea>
       </Tabs>
+       <SheetFooter className="mt-auto pt-4">
+            <Separator className="mb-4" />
+            <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={handleResetChanges}>
+                    <RotateCcw className="mr-2 h-4 w-4" /> Reset
+                </Button>
+                <Button onClick={handleSaveChanges}>
+                    <Save className="mr-2 h-4 w-4" /> Save Changes
+                </Button>
+            </div>
+        </SheetFooter>
     </SheetContent>
   );
 }
