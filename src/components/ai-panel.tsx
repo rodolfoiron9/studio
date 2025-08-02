@@ -201,7 +201,7 @@ export function AiPanel({ setCustomization, currentCustomization }: AiPanelProps
         <div className="space-y-2 rounded-lg border p-4">
             <h3 className="font-headline text-lg font-semibold flex items-center gap-2"><MagicWandIcon className="h-5 w-5 text-primary"/> Magic Hand</h3>
             <p className="text-sm text-muted-foreground">Let the AI generate an entire scene for you with one click.</p>
-            <Button onClick={handleMagicHand} disabled={isMagicPending} className="w-full">
+            <Button onClick={handleMagicHand} disabled={isMagicPending || isPending} className="w-full">
                 {isMagicPending ? <Loader className="animate-spin" /> : "Generate Everything"}
             </Button>
         </div>
@@ -215,11 +215,11 @@ export function AiPanel({ setCustomization, currentCustomization }: AiPanelProps
                             <FormField control={presetForm.control} name="musicStyle" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Music Style / Mood</FormLabel>
-                                    <FormControl><Input placeholder="e.g., chill lo-fi beats" {...field} /></FormControl>
+                                    <FormControl><Input placeholder="e.g., chill lo-fi beats" {...field} disabled={isPending || isMagicPending} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
-                            <Button type="submit" disabled={isPending} className="w-full">
+                            <Button type="submit" disabled={isPending || isMagicPending} className="w-full">
                                {isPending ? <Loader className="animate-spin" /> : "Generate Preset"}
                             </Button>
                         </form>
@@ -234,11 +234,11 @@ export function AiPanel({ setCustomization, currentCustomization }: AiPanelProps
                             <FormField control={environmentForm.control} name="description" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Environment Description</FormLabel>
-                                    <FormControl><Textarea placeholder="e.g., a serene alien jungle at dusk" {...field} /></FormControl>
+                                    <FormControl><Textarea placeholder="e.g., a serene alien jungle at dusk" {...field} disabled={isPending || isMagicPending} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
-                            <Button type="submit" disabled={isPending} className="w-full">
+                            <Button type="submit" disabled={isPending || isMagicPending} className="w-full">
                                 {isPending ? <Loader className="animate-spin" /> : "Generate Environment"}
                             </Button>
                         </form>
@@ -253,11 +253,11 @@ export function AiPanel({ setCustomization, currentCustomization }: AiPanelProps
                             <FormField control={videoForm.control} name="prompt" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Video Prompt</FormLabel>
-                                    <FormControl><Textarea placeholder="e.g., a time-lapse of a futuristic city" {...field} /></FormControl>
+                                    <FormControl><Textarea placeholder="e.g., a time-lapse of a futuristic city" {...field} disabled={isPending || isMagicPending} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
-                            <Button type="submit" disabled={isPending} className="w-full">
+                            <Button type="submit" disabled={isPending || isMagicPending} className="w-full">
                                 {isPending ? <Loader className="animate-spin" /> : "Generate Video"}
                             </Button>
                         </form>
@@ -272,11 +272,11 @@ export function AiPanel({ setCustomization, currentCustomization }: AiPanelProps
                             <FormField control={albumArtForm.control} name="prompt" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Album Art Prompt</FormLabel>
-                                    <FormControl><Textarea placeholder="e.g., a vibrant, abstract representation of soundwaves" {...field} /></FormControl>
+                                    <FormControl><Textarea placeholder="e.g., a vibrant, abstract representation of soundwaves" {...field} disabled={isPending || isMagicPending} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
-                            <Button type="submit" disabled={isPending} className="w-full">
+                            <Button type="submit" disabled={isPending || isMagicPending} className="w-full">
                                 {isPending ? <Loader className="animate-spin" /> : "Generate Art"}
                             </Button>
                         </form>
@@ -291,11 +291,11 @@ export function AiPanel({ setCustomization, currentCustomization }: AiPanelProps
                             <FormField control={animationForm.control} name="musicStyle" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Music Style</FormLabel>
-                                    <FormControl><Input placeholder="e.g., dark synthwave" {...field} /></FormControl>
+                                    <FormControl><Input placeholder="e.g., dark synthwave" {...field} disabled={isPending || isMagicPending} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
-                            <Button type="submit" disabled={isPending} className="w-full">
+                            <Button type="submit" disabled={isPending || isMagicPending} className="w-full">
                                 {isPending ? <Loader className="animate-spin" /> : "Generate Animation Idea"}
                             </Button>
                         </form>
