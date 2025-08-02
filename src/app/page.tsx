@@ -23,12 +23,12 @@ export default function Home() {
 
 
   const [customization, setCustomization] = React.useState<CubeCustomization>({
-    faceColor1: "#0a0a1a",
-    faceColor2: "#0a0a1a",
-    faceColor3: "#0a0a1a",
-    faceColor4: "#0a0a1a",
-    faceColor5: "#0a0a1a",
-    faceColor6: "#0a0a1a",
+    faceColor1: "#1a2a4f",
+    faceColor2: "#1a2a4f",
+    faceColor3: "#1a2a4f",
+    faceColor4: "#1a2a4f",
+    faceColor5: "#1a2a4f",
+    faceColor6: "#1a2a4f",
     edgeStyle: "round",
     materialStyle: 'solid',
     roundness: 0.2,
@@ -37,7 +37,7 @@ export default function Home() {
     particleColor2: "#9400D3",
     particleColor3: "#FFFFFF",
     text1: "RUDYBTZ",
-    text2: "THE ALBUM",
+    text2: "MAKING MAGIC",
     text3: "",
     text4: "",
     text5: "",
