@@ -87,6 +87,7 @@ export default function AlbumArtPage() {
                    )}
                    {!isPending && !generatedImage && (
                        <div className="text-center text-muted-foreground">
+                            <ImageIcon className="h-12 w-12 mx-auto mb-2"/>
                             <p>Your generated image will be displayed here once it&apos;s ready.</p>
                        </div>
                    )}
