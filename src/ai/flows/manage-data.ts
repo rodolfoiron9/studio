@@ -23,21 +23,21 @@ const ManageDataOutputSchema = z.object({
 });
 export type ManageDataOutput = z.infer<typeof ManageDataOutputSchema>;
 
-const getTracklistData = ai.defineTool(
+const queryKnowledgeBase = ai.defineTool(
     {
-      name: 'getTracklistData',
-      description: 'Returns the raw TypeScript code content of the album tracklist data. This is useful for answering questions about what tracks are in the album.',
+      name: 'queryKnowledgeBase',
+      description: 'Reads and returns the content of the knowledge base. Use this to answer questions about the project data, such as tracklists, dependencies, etc.',
       inputSchema: z.object({}),
       outputSchema: z.string(),
     },
     async () => {
         try {
-            const filePath = path.join(process.cwd(), 'src', 'lib', 'constants.ts');
-            const fileContent = await fs.readFile(filePath, 'utf-8');
+            const dbPath = path.join(process.cwd(), 'src', 'lib', 'quantum-database.json');
+            const fileContent = await fs.readFile(dbPath, 'utf-8');
             return fileContent;
         } catch (error) {
-            console.error('Failed to read tracklist data:', error);
-            return 'Error: Could not read the tracklist data file.';
+            console.error('Failed to read knowledge base:', error);
+            return 'Error: Could not read the knowledge base file. It may need to be created first by scanning the project.';
         }
     }
 );
@@ -51,8 +51,6 @@ const scanProjectFiles = ai.defineTool(
     },
     async () => {
         try {
-            // In a real scenario, this would be a more comprehensive scan.
-            // For this prototype, we'll identify a few key files.
             const tracklistPath = path.join(process.cwd(), 'src', 'lib', 'constants.ts');
             const packageJsonPath = path.join(process.cwd(), 'package.json');
             
@@ -65,8 +63,8 @@ const scanProjectFiles = ai.defineTool(
             return JSON.stringify({
                 summary: `Scan complete. Found ${trackCount} tracks in constants.ts. Project dependencies include keys like ${Object.keys(dependencies).slice(0, 3).join(', ')}.`,
                 filesScanned: [
-                    { file: 'src/lib/constants.ts', purpose: 'Album tracklist data.'},
-                    { file: 'package.json', purpose: 'Project dependencies and scripts.'}
+                    { file: 'src/lib/constants.ts', purpose: 'Album tracklist data.', content: tracklistContent },
+                    { file: 'package.json', purpose: 'Project dependencies and scripts.', content: packageJsonContent }
                 ]
             }, null, 2);
         } catch (error: any) {
@@ -79,7 +77,7 @@ const scanProjectFiles = ai.defineTool(
 const createKnowledgeBase = ai.defineTool(
     {
         name: 'createKnowledgeBase',
-        description: 'Processes the data from scanned project files and creates a structured dataset. It can then (conceptually) save this dataset to an external source like Google Drive for fine-tuning.',
+        description: 'Processes the data from scanned project files and saves it to the persistent quantum-database.json file.',
         inputSchema: z.object({
             scannedData: z.string().describe('The JSON string result from the scanProjectFiles tool.')
         }),
@@ -88,19 +86,38 @@ const createKnowledgeBase = ai.defineTool(
     async ({ scannedData }) => {
         try {
             const data = JSON.parse(scannedData);
-            // This is a simulation of creating a structured dataset.
+            const dbPath = path.join(process.cwd(), 'src', 'lib', 'quantum-database.json');
+            
+            // Extract relevant info for the knowledge base
+            const packageJson = JSON.parse(data.filesScanned.find((f: any) => f.file === 'package.json').content);
+            const tracklistRaw = data.filesScanned.find((f: any) => f.file === 'src/lib/constants.ts').content;
+            
+            // A simple way to parse tracks from the constants file string
+            const tracks = tracklistRaw
+              .match(/{\s*title: ".*?",\s*duration: ".*?",/gs)
+              ?.map(t => {
+                const titleMatch = t.match(/title: "(.*?)"/);
+                const durationMatch = t.match(/duration: "(.*?)"/);
+                return { title: titleMatch ? titleMatch[1] : 'Unknown', duration: durationMatch ? durationMatch[1] : 'Unknown' };
+              }) || [];
+
             const knowledgeBase = {
-                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
                 source: 'Project Scan',
-                content: data,
-                // Placeholder for the external storage link
-                googleDriveLink: `https://drive.google.com/mock-file-id/${Date.now()}`
+                project: {
+                    name: packageJson.name,
+                    version: packageJson.version,
+                    dependencies: Object.keys(packageJson.dependencies),
+                },
+                album: {
+                    trackCount: tracks.length,
+                    tracks: tracks,
+                }
             };
+            
+            await fs.writeFile(dbPath, JSON.stringify(knowledgeBase, null, 2), 'utf-8');
 
-            // In a real app, you'd use the Google Drive API here to upload the file.
-            console.log("Simulating saving knowledge base to Google Drive:", knowledgeBase);
-
-            return `Successfully created knowledge base from scanned files. The dataset has been conceptually saved to Google Drive at ${knowledgeBase.googleDriveLink}. I am now ready to answer questions based on this new context.`;
+            return `Successfully created and saved knowledge base to src/lib/quantum-database.json. I am now ready to answer questions based on this new context.`;
         } catch (error: any) {
             console.error('Failed to create knowledge base:', error);
             return `Error: Could not create knowledge base. ${error.message}`;
@@ -117,16 +134,16 @@ const prompt = ai.definePrompt({
   name: 'manageDataPrompt',
   input: {schema: ManageDataInputSchema},
   output: {schema: ManageDataOutputSchema},
-  tools: [getTracklistData, scanProjectFiles, createKnowledgeBase],
+  tools: [queryKnowledgeBase, scanProjectFiles, createKnowledgeBase],
   prompt: `You are an AI data management assistant for a music application.
-  The user will ask you questions about the application's data.
-  
-  If the user asks you to "scan the project" or "create a knowledge base", you MUST follow these steps:
-  1. First, call the 'scanProjectFiles' tool to get a summary of the project's data sources.
-  2. Second, take the output from 'scanProjectFiles' and pass it directly to the 'createKnowledgeBase' tool.
-  3. Finally, report the result of the 'createKnowledgeBase' tool back to the user.
+  Your primary knowledge source is a JSON file that you can access with the 'queryKnowledgeBase' tool.
 
-  For all other questions, use the available tools to inspect the data and provide helpful responses.
+  If the user asks you to "scan the project", "create a knowledge base", or if you cannot answer a question using your existing knowledge, you MUST follow these steps:
+  1. First, call the 'scanProjectFiles' tool to get a fresh summary of the project's data sources.
+  2. Second, take the output from 'scanProjectFiles' and pass it directly to the 'createKnowledgeBase' tool to save it.
+  3. Finally, report the result of the 'createKnowledgeBase' tool back to the user and let them know you are ready.
+
+  For all other questions, use the 'queryKnowledgeBase' tool to inspect the data and provide helpful responses.
   If you are asked to modify data, state that you are not yet capable of modifying data, but you can provide the steps to do it manually.
 
   User query: {{{query}}}
