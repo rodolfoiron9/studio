@@ -65,7 +65,7 @@ export default function Home() {
     } else if (currentLyric) {
         // We've passed the last lyric, but the song hasn't ended.
         // We can choose to clear it, or let it linger. Let's clear it.
-        if(currentTime > playingTrack.lyrics[playingTrack.lyrics.length - 1].time + playingTrack.lyrics[playingTrack.lyrics.length - 1].duration) {
+        if(playingTrack.lyrics.length > 0 && currentTime > playingTrack.lyrics[playingTrack.lyrics.length - 1].time + playingTrack.lyrics[playingTrack.lyrics.length - 1].duration) {
           setCurrentLyric(null);
         }
     }
@@ -74,19 +74,22 @@ export default function Home() {
   const handleTrackSelect = (track: Track) => {
     if (playingTrack?.title === track.title) {
       if (isPlaying) {
-        audioRef.current?.pause();
+        // audioRef.current?.pause(); // No-op for prototype
         setIsPlaying(false);
       } else {
-        audioRef.current?.play();
+        // audioRef.current?.play(); // No-op for prototype
         setIsPlaying(true);
       }
     } else {
       setPlayingTrack(track);
-      if (audioRef.current) {
-        audioRef.current.src = track.audioSrc;
-        audioRef.current.play();
-        setIsPlaying(true);
-      }
+      setIsPlaying(true);
+      // The following lines are commented out to prevent errors in the prototype
+      // as the audio files do not actually exist.
+      // if (audioRef.current) {
+      //   audioRef.current.src = track.audioSrc;
+      //   audioRef.current.play();
+      //   setIsPlaying(true);
+      // }
       setCustomization(prev => ({ 
         ...prev, 
         animation: 'audio-reactive',
@@ -111,14 +114,40 @@ export default function Home() {
       }));
     });
 
+    // Simulate lyric progression for the prototype
+    let lyricInterval: NodeJS.Timeout;
+    if (isPlaying && playingTrack?.lyrics?.length) {
+      let lyricIndex = 0;
+      setCurrentLyric(playingTrack.lyrics[0]);
+      lyricInterval = setInterval(() => {
+        lyricIndex++;
+        if (lyricIndex < playingTrack.lyrics.length) {
+          setCurrentLyric(playingTrack.lyrics[lyricIndex]);
+        } else {
+          // End of song simulation
+          setIsPlaying(false);
+          setPlayingTrack(null);
+          setCurrentLyric(null);
+          clearInterval(lyricInterval);
+           setCustomization(prev => ({
+            ...prev, 
+            animation: 'pulse',
+            text1: "ICE", text2: "COLD", text3: "", text4: "", text5: "", text6: ""
+          }));
+        }
+      }, 500); // Change lyric every 0.5s for demo
+    }
+
+
     return () => {
       if (audioRef.current) {
         audioRef.current.removeEventListener('timeupdate', handleTimeUpdate);
         audioRef.current.pause();
-        audioRef.current = null;
+        // audioRef.current = null; // This causes issues with hot-reloading, avoid nulling it
       }
+      if(lyricInterval) clearInterval(lyricInterval);
     }
-  }, []);
+  }, [isPlaying, playingTrack]);
 
   React.useEffect(() => {
     if (customization.background === 'video' && customization.environmentVideo && videoRef.current) {
