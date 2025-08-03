@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { runFullPresetGenerator } from "@/app/actions";
-import { Loader, Wand2, VenetianMask, Image as ImageIcon, Sparkles, Check } from "lucide-react";
+import { Loader, Wand2, VenetianMask, Image as ImageIcon, Sparkles, Check, Save } from "lucide-react";
 import Image from "next/image";
 import type { GenerateCubePresetOutput } from "@/ai/flows/generate-cube-preset";
+import { Separator } from "@/components/ui/separator";
 
 type FullPreset = {
     cube: GenerateCubePresetOutput;
@@ -38,20 +39,30 @@ export default function PresetsPage() {
         });
     }
 
-    const handleApplyPreset = () => {
+    const handleApplyToMainExperience = () => {
         if (!generatedPreset) return;
         // In a real app, you would have a state management solution (like Zustand or Context)
         // to pass this preset to the main page component.
         // For this prototype, we'll just show a success message.
         localStorage.setItem('appliedPreset', JSON.stringify(generatedPreset));
         toast({ 
-            title: "Preset Applied!", 
+            title: "Scene Applied!", 
             description: "The main experience has been updated. Go to the Public Site to see it.",
             action: (
                 <a href="/" target="_blank">
                     <Button variant="secondary">View</Button>
                 </a>
             )
+        });
+    }
+
+    const handleSavePreset = () => {
+        if (!generatedPreset) return;
+        // In a real app, this would save the preset to a database.
+        console.log("Saving preset:", generatedPreset);
+        toast({
+            title: "Preset Saved!",
+            description: "This preset can now be used for any track."
         });
     }
 
@@ -159,10 +170,14 @@ export default function PresetsPage() {
                                 </div>
                             )}
                         </CardContent>
-                         <CardFooter>
-                            <Button onClick={handleApplyPreset} className="w-full" disabled={isPending || !generatedPreset}>
+                         <CardFooter className="flex flex-col gap-2">
+                             <Button onClick={handleApplyToMainExperience} className="w-full" disabled={isPending || !generatedPreset}>
                                 <Check className="mr-2" />
-                                Apply to Main Experience
+                                Convert Image to 3D (Cube + Environment)
+                            </Button>
+                             <Button onClick={handleSavePreset} variant="outline" className="w-full" disabled={isPending || !generatedPreset}>
+                                <Save className="mr-2" />
+                                Save Preset
                             </Button>
                         </CardFooter>
                     </Card>
