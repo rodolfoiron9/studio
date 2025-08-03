@@ -3,6 +3,7 @@
 
 import * as React from "react";
 import * as THREE from "three";
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import type { CubeCustomization } from "@/lib/types";
 
 // Helper function to calculate luminance from a hex color
@@ -23,6 +24,7 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
   const rendererRef = React.useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = React.useRef<THREE.Scene | null>(null);
   const cameraRef = React.useRef<THREE.PerspectiveCamera | null>(null);
+  const controlsRef = React.useRef<OrbitControls | null>(null);
   const cubeRef = React.useRef<THREE.Mesh | null>(null);
   const textCanvasesRef = React.useRef<HTMLCanvasElement[]>([]);
   const audioAnalyserRef = React.useRef<THREE.AudioAnalyser | null>(null);
@@ -45,6 +47,10 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     mount.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controlsRef.current = controls;
     
     camera.position.z = 5;
 
@@ -74,10 +80,9 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
       animationId = requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
 
-      if(cubeRef.current) {
-        cubeRef.current.rotation.x += 0.005;
-        cubeRef.current.rotation.y += 0.005;
+      controls.update();
 
+      if(cubeRef.current) {
         // The animation logic is now also part of the animate loop
         if (customization.animation === 'pulse') {
             const scale = 1 + Math.sin(elapsedTime * 2) * 0.05;
@@ -109,6 +114,7 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
     return () => {
       cancelAnimationFrame(animationId);
       window.removeEventListener('resize', handleResize);
+      controls.dispose();
       if (mount && renderer.domElement) {
         mount.removeChild(renderer.domElement);
       }
