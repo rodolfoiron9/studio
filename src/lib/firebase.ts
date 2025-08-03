@@ -4,12 +4,12 @@ import { getStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  projectId: "rudybtz-albumverse",
-  appId: "1:164281201515:web:015b996941a348ba0b922e",
-  storageBucket: "rudybtz-albumverse.appspot.com",
-  apiKey: "AIzaSyC1j1HBkuhL3vXvXg6LWf9pnNlHGv0xwnc",
-  authDomain: "rudybtz-albumverse.firebaseapp.com",
-  messagingSenderId: "164281201515",
+  "projectId": "rudybtz-albumverse",
+  "appId": "1:164281201515:web:015b996941a348ba0b922e",
+  "storageBucket": "rudybtz-albumverse.firebasestorage.app",
+  "apiKey": "AIzaSyC1j1HBkuhL3vXvXg6LWf9pnNlHGv0xwnc",
+  "authDomain": "rudybtz-albumverse.firebaseapp.com",
+  "messagingSenderId": "164281201515"
 };
 
 // Initialize Firebase
