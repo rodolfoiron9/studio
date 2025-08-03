@@ -4,12 +4,11 @@
 import { useState, useEffect, useTransition } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Music, Image as ImageIcon, FileJson, UploadCloud, MoreVertical, FileText, Trash2, Download, Pencil, Loader, RefreshCw, Video, Folder } from "lucide-react";
+import { Music, Image as ImageIcon, FileJson, UploadCloud, MoreVertical, FileText, Trash2, Download, Loader, RefreshCw, Video, Folder } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import type { ManagedFile } from "@/lib/types";
@@ -25,7 +24,7 @@ export default function FileManagementPage() {
     const [uploadProgress, setUploadProgress] = useState(0);
     const [isUploading, setIsUploading] = useState(false);
     const [isListing, startListingTransition] = useTransition();
-    const [isDeleting, startDeletingTransition] = useTransition();
+    const [deletingPath, setDeletingPath] = useState<string | null>(null);
 
     const fetchFiles = () => {
         startListingTransition(async () => {
@@ -76,16 +75,16 @@ export default function FileManagementPage() {
         );
     };
 
-    const handleDelete = (path: string) => {
-        startDeletingTransition(async () => {
-            const result = await deleteFile(path);
-            if (result.success) {
-                toast({ title: "File Deleted", description: "The file has been removed from storage."});
-                fetchFiles(); // Refresh the file list
-            } else {
-                toast({ variant: 'destructive', title: "Error", description: result.error });
-            }
-        });
+    const handleDelete = async (path: string) => {
+        setDeletingPath(path);
+        const result = await deleteFile(path);
+        if (result.success) {
+            toast({ title: "File Deleted", description: "The file has been removed from storage."});
+            fetchFiles(); // Refresh the file list
+        } else {
+            toast({ variant: 'destructive', title: "Error", description: result.error });
+        }
+        setDeletingPath(null);
     }
 
     const getIcon = (type: ManagedFile['type']) => {
@@ -115,7 +114,7 @@ export default function FileManagementPage() {
                     <CardDescription>{description}</CardDescription>
                 </div>
                  <Button variant="outline" size="sm" onClick={fetchFiles} disabled={isListing}>
-                    {isListing ? <Loader className="mr-2 animate-spin"/> : <RefreshCw className="mr-2"/>}
+                    {isListing ? <Loader className="mr-2 animate-spin h-4 w-4"/> : <RefreshCw className="mr-2 h-4 w-4"/>}
                     Refresh
                 </Button>
             </CardHeader>
@@ -132,15 +131,15 @@ export default function FileManagementPage() {
                     </TableHeader>
                     <TableBody>
                         {isListing ? (
-                             Array.from({length: 5}).map((_, i) => (
+                             Array.from({length: 3}).map((_, i) => (
                                 <TableRow key={i}>
-                                    <TableCell colSpan={5} className="p-2"><div className="h-8 bg-muted rounded animate-pulse"></div></TableCell>
+                                    <TableCell colSpan={5} className="p-2"><div className="h-10 bg-muted rounded animate-pulse"></div></TableCell>
                                 </TableRow>
                             ))
                         ) : files.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                                    No files found in storage.
+                                    No files found in storage. Upload a file to get started.
                                 </TableCell>
                             </TableRow>
                         ) : (
@@ -155,16 +154,16 @@ export default function FileManagementPage() {
                                     <TableCell className="text-right">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" disabled={isDeleting}>
-                                                    {isDeleting ? <Loader className="animate-spin"/> : <MoreVertical className="h-4 w-4" />}
+                                                <Button variant="ghost" size="icon" disabled={!!deletingPath}>
+                                                    {deletingPath === file.path ? <Loader className="animate-spin h-4 w-4"/> : <MoreVertical className="h-4 w-4" />}
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent>
                                                 <DropdownMenuItem onSelect={() => window.open(file.url, '_blank')}>
-                                                    <Download className="mr-2"/> Download
+                                                    <Download className="mr-2 h-4 w-4"/> Download
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem className="text-destructive" onSelect={() => handleDelete(file.path)}>
-                                                    <Trash2 className="mr-2"/> Delete
+                                                <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => handleDelete(file.path)}>
+                                                    <Trash2 className="mr-2 h-4 w-4"/> Delete
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
@@ -185,42 +184,50 @@ export default function FileManagementPage() {
 
             <Tabs defaultValue="all" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-4">
-                    <TabsTrigger value="all"><Folder className="mr-2"/>All Files</TabsTrigger>
-                    <TabsTrigger value="upload"><UploadCloud className="mr-2"/>Upload Files</TabsTrigger>
+                    <TabsTrigger value="all"><Folder className="mr-2 h-4 w-4"/>Cloud Storage</TabsTrigger>
+                    <TabsTrigger value="upload"><UploadCloud className="mr-2 h-4 w-4"/>Upload New File</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="all">
-                    {renderFileBrowser("Cloud Storage Library", "All files currently stored in your Firebase Storage bucket.")}
+                    {renderFileBrowser("Storage Library", "All files currently in your Firebase Storage bucket.")}
                 </TabsContent>
                 <TabsContent value="upload">
                      <Card>
                         <CardHeader>
                             <CardTitle>File Uploader</CardTitle>
-                            <CardDescription>Upload new assets to your project. Select a file and click upload.</CardDescription>
+                            <CardDescription>Upload new assets to your project. Select a file and the upload will begin automatically.</CardDescription>
                         </CardHeader>
                         <CardContent>
-                           <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-muted rounded-lg p-8 space-y-4">
+                           <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-muted rounded-lg p-8 space-y-4 text-center">
                                 <UploadCloud className="h-16 w-16 text-muted-foreground"/>
-                                <p className="text-muted-foreground text-center">
-                                    {selectedFile ? `Selected: ${selectedFile.name} (${formatBytes(selectedFile.size)})` : "Drag and drop files here, or click to select files."}
-                                </p>
-                                <div className="flex w-full max-w-sm items-center space-x-2">
-                                    <Input 
-                                        type="file" 
-                                        onChange={handleFileChange}
-                                        disabled={isUploading}
-                                    />
-                                    <Button onClick={handleUpload} disabled={!selectedFile || isUploading}>
-                                       {isUploading ? <Loader className="animate-spin" /> : <UploadCloud />}
-                                    </Button>
-                                </div>
-                                {isUploading && (
+                                {selectedFile && !isUploading && (
+                                    <p className="text-muted-foreground">
+                                       Ready to upload: {selectedFile.name} ({formatBytes(selectedFile.size)})
+                                    </p>
+                                )}
+                                 {isUploading && (
                                     <div className="w-full max-w-sm">
+                                        <p className="text-sm text-muted-foreground mb-2">Uploading {selectedFile?.name}...</p>
                                         <Progress value={uploadProgress} className="w-full" />
                                         <p className="text-xs text-center mt-1">{Math.round(uploadProgress)}%</p>
                                     </div>
                                 )}
-                                {!isUploading && <p className="text-xs text-muted-foreground mt-2">Max file size: 50MB.</p> }
+                                 {!isUploading && (
+                                     <>
+                                        <Button onClick={() => document.getElementById('file-upload-input')?.click()} disabled={isUploading}>
+                                            {isUploading ? <Loader className="animate-spin mr-2" /> : <UploadCloud className="mr-2"/>}
+                                            {isUploading ? "Uploading..." : "Choose File"}
+                                        </Button>
+                                        <Input 
+                                            id="file-upload-input"
+                                            type="file" 
+                                            onChange={handleFileChange}
+                                            disabled={isUploading}
+                                            className="hidden"
+                                        />
+                                         <p className="text-xs text-muted-foreground mt-2">Max file size: 50MB.</p>
+                                     </>
+                                 )}
                            </div>
                         </CardContent>
                      </Card>
@@ -229,3 +236,5 @@ export default function FileManagementPage() {
         </div>
     )
 }
+
+    
