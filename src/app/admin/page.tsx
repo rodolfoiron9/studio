@@ -1,11 +1,18 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Home, Settings, Database, Palette, KeyRound, Film, Image, Megaphone, Link as LinkIcon, Folder } from "lucide-react";
+import { Home, Settings, Database, Palette, KeyRound, Film, Image, Megaphone, Link as LinkIcon, Folder, Shapes } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminDashboard() {
   
   const features = [
+     { 
+      href: "/admin/presets", 
+      icon: <Shapes/>, 
+      title: "AI Scene Presets", 
+      description: "Generate entire scenes from a single prompt.",
+      content: "Create a cohesive environment and cube style based on a creative idea or music genre."
+    },
     { 
       href: "/admin/database", 
       icon: <Database/>, 

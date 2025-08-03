@@ -101,6 +101,21 @@ export default function Home() {
   };
 
   React.useEffect(() => {
+    const appliedPreset = localStorage.getItem('appliedPreset');
+    if (appliedPreset) {
+      try {
+        const parsedPreset = JSON.parse(appliedPreset);
+        setCustomization(prev => ({
+          ...prev,
+          ...parsedPreset.cube,
+          environmentImage: parsedPreset.environment.environmentImage,
+        }));
+        localStorage.removeItem('appliedPreset'); // Clear after applying
+      } catch (e) {
+        console.error("Failed to parse applied preset", e);
+      }
+    }
+
     setIsMounted(true);
     audioRef.current = new Audio();
     audioRef.current.addEventListener('timeupdate', handleTimeUpdate);

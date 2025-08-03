@@ -27,6 +27,24 @@ export async function runPresetGenerator(musicStyle: string): Promise<ActionResu
     }
 }
 
+export async function runFullPresetGenerator(prompt: string): Promise<ActionResult<{
+    cube: Awaited<ReturnType<typeof generateCubePreset>>;
+    environment: Awaited<ReturnType<typeof generateEnvironment>>;
+}>> {
+     try {
+        const [cubeResult, environmentResult] = await Promise.all([
+            generateCubePreset({ musicStyle: prompt }),
+            generateEnvironment({ environmentDescription: prompt })
+        ]);
+        
+        return { success: true, data: { cube: cubeResult, environment: environmentResult } };
+    } catch (error: any) {
+        console.error("Full preset generation failed:", error);
+        return { success: false, error: `Failed to generate full preset: ${error.message}` };
+    }
+}
+
+
 export async function runEnvironmentGenerator(environmentDescription: string): Promise<ActionResult<Awaited<ReturnType<typeof generateEnvironment>>>> {
     try {
         const result = await generateEnvironment({ environmentDescription });
