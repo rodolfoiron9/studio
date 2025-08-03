@@ -32,7 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
              <SidebarTrigger />
              <h2 className="font-headline text-lg font-semibold group-data-[collapsible=icon]:hidden">Admin Panel</h2>
           </div>
-        </SiderbarHeader>
+        </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
             {menuItems.map((item) => (
