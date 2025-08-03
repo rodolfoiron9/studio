@@ -1,11 +1,18 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Home, Settings, Database, Palette, KeyRound, Film, Image, Megaphone, Link as LinkIcon, Folder, Shapes } from "lucide-react";
+import { Home, Settings, Database, Palette, KeyRound, Film, Image, Megaphone, Link as LinkIcon, Folder, Shapes, Rocket } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminDashboard() {
   
   const features = [
+     { 
+      href: "/admin/roadmap", 
+      icon: <Rocket/>, 
+      title: "Development Roadmap", 
+      description: "Track our progress and see what's next for the project.",
+      content: "View the full development plan, including completed tasks and future features."
+    },
      { 
       href: "/admin/presets", 
       icon: <Shapes/>, 
