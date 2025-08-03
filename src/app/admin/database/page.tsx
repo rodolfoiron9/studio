@@ -122,7 +122,7 @@ export default function DatabasePage() {
                         <Input 
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
-                            placeholder="Ask the AI to build something..."
+                            placeholder="Ask the AI about your data..."
                             disabled={isPending}
                             className="flex-grow"
                             suppressHydrationWarning
