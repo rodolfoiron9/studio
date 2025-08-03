@@ -5,8 +5,8 @@
 
 @layer base {
   :root {
-    --background: 240 4% 96%; /* Light Cool Gray */
-    --foreground: 282.8 30% 15%; /* Black Violet */
+    --background: 270 52% 74%; /* Light Cool Gray */
+    --foreground: 240 61% 16%; /* Black Violet */
 
     --card: 240 4% 96%;
     --card-foreground: 282.8 30% 15%; /* Black Violet */
@@ -14,24 +14,24 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 6% 10%;
 
-    --primary: 262.1 83.3% 57.8%; /* Vibrant Purple */
+    --primary: 282.8 100% 61.4%; /* Vibrant Purple */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 5% 90%;
+    --secondary: 234.8 64.1% 20%;
     --secondary-foreground: 240 6% 10%;
 
-    --muted: 240 5% 90%;
+    --muted: 234.8 64.1% 20%;
     --muted-foreground: 240 4% 30%;
 
-    --accent: 282.8 100% 61.4%; /* Ultra Violet */
+    --accent: 184 9% 33%; /* Ultra Violet */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 6% 88%;
-    --input: 240 6% 88%;
-    --ring: 262.1 83.3% 57.8%;
+    --border: 234.8 64.1% 20%;
+    --input: 234.8 64.1% 20%;
+    --ring: 182.5 100% 74.3%;
 
     --radius: 0.5rem;
     
@@ -49,8 +49,8 @@
   }
 
   .dark {
-    --background: 234.8 64.1% 10%; /* Dark Navy Blue */
-    --foreground: 282.8 100% 95%; /* Light Lavender */
+    --background: 270 52% 74%; /* Dark Navy Blue */
+    --foreground: 240 61% 16%; /* Light Lavender */
 
     --card: 234.8 64.1% 10%;
     --card-foreground: 282.8 100% 95%; /* Light Lavender */
@@ -67,7 +67,7 @@
     --muted: 234.8 64.1% 20%;
     --muted-foreground: 240 5% 75%;
 
-    --accent: 282.8 100% 61.4%; /* Ultra Violet */
+    --accent: 184 9% 33%; /* Ultra Violet */
     --accent-foreground: 234.8 64.1% 10%;
 
     --destructive: 0 62.8% 30.6%;
