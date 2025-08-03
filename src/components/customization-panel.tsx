@@ -13,9 +13,94 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import { AiPanel } from "./ai-panel";
-import { Upload, Save, RotateCcw } from "lucide-react";
+import { Upload, Save, RotateCcw, Image as ImageIcon, Check } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from "@/lib/firebase";
+import { useToast } from "@/hooks/use-toast";
+import { Progress } from "@/components/ui/progress";
+import Image from "next/image";
+
+interface FileUploadProps {
+  onUploadComplete: (url: string) => void;
+  label: string;
+  currentImageUrl?: string;
+}
+
+function FileUpload({ onUploadComplete, label, currentImageUrl }: FileUploadProps) {
+    const { toast } = useToast();
+    const [file, setFile] = useState<File | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            setFile(event.target.files[0]);
+            handleUpload(event.target.files[0]);
+        }
+    };
+
+    const handleUpload = (selectedFile: File) => {
+        if (!selectedFile) return;
+
+        setIsUploading(true);
+        setUploadProgress(0);
+        const storageRef = ref(storage, `uploads/${Date.now()}_${selectedFile.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, selectedFile);
+
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                setUploadProgress(progress);
+            },
+            (error) => {
+                toast({ variant: 'destructive', title: "Upload Error", description: error.message });
+                setIsUploading(false);
+            },
+            () => {
+                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                    toast({ title: "Upload Complete", description: `File uploaded successfully.` });
+                    setIsUploading(false);
+                    setFile(null);
+                    onUploadComplete(downloadURL);
+                });
+            }
+        );
+    };
+
+    return (
+        <div className="space-y-2">
+             <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
+             <Button 
+                variant="outline" 
+                className="h-20 w-full flex-col"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+            >
+                {isUploading ? (
+                    <div className="w-full px-2 space-y-1">
+                        <Progress value={uploadProgress}/>
+                        <p className="text-xs">{Math.round(uploadProgress)}%</p>
+                    </div>
+                ) : currentImageUrl ? (
+                    <div className="relative w-full h-full">
+                        <Image src={currentImageUrl} alt={label} layout="fill" objectFit="cover" className="rounded-md" />
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                            <Upload className="h-6 w-6 text-white"/>
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        <Upload className="h-4 w-4 mb-1"/>
+                        <span className="text-xs">{label}</span>
+                    </>
+                )}
+            </Button>
+        </div>
+    );
+}
 
 interface CustomizationPanelProps {
   customization: CubeCustomization;
@@ -26,8 +111,6 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
   const [localCustomization, setLocalCustomization] = useState<CubeCustomization>(customization);
 
   useEffect(() => {
-    // When the external customization changes (e.g. via AI preset),
-    // update the local state to match it.
     setLocalCustomization(customization);
   }, [customization]);
 
@@ -43,17 +126,24 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
      setLocalCustomization(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleImageUpload = (faceIndex: number, url: string) => {
+      handleValueChange(`faceImage${faceIndex + 1}`, url);
+  }
+
+  const handleEnvironmentImageUpload = (url: string) => {
+      handleValueChange('environmentImage', url);
+  }
+
   const handleSaveChanges = () => {
     setCustomization(localCustomization);
-    // Maybe show a toast message here
   };
   
   const handleResetChanges = () => {
     setLocalCustomization(customization);
-    // Maybe show a toast message here
   };
 
   const faceColorKeys: (keyof CubeCustomization)[] = ["faceColor1", "faceColor2", "faceColor3", "faceColor4", "faceColor5", "faceColor6"];
+  const faceImageKeys: (keyof CubeCustomization)[] = ["faceImage1", "faceImage2", "faceImage3", "faceImage4", "faceImage5", "faceImage6"];
   const particleColorKeys: (keyof CubeCustomization)[] = ["particleColor1", "particleColor2", "particleColor3"];
   const textKeys: (keyof CubeCustomization)[] = ["text1", "text2", "text3", "text4", "text5", "text6"];
 
@@ -93,11 +183,13 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
                   </TabsContent>
                   <TabsContent value="images" className="pt-4">
                     <div className="grid grid-cols-3 gap-2">
-                      {faceColorKeys.map((_, index) => (
-                        <Button key={`face-img-${index}`} variant="outline" className="h-12 w-full flex-col">
-                          <Upload className="h-4 w-4"/>
-                          <span className="text-xs">Face {index + 1}</span>
-                        </Button>
+                      {faceImageKeys.map((key, index) => (
+                        <FileUpload 
+                            key={key}
+                            label={`Face ${index + 1}`}
+                            onUploadComplete={(url) => handleImageUpload(index, url)}
+                            currentImageUrl={localCustomization[key] as string}
+                        />
                       ))}
                     </div>
                   </TabsContent>
@@ -195,6 +287,16 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
                   ))}
                 </RadioGroup>
             </div>
+             {localCustomization.background === 'image' && (
+                 <div className="space-y-2">
+                    <Label>Custom Background Image</Label>
+                    <FileUpload 
+                        label="Upload Environment" 
+                        onUploadComplete={handleEnvironmentImageUpload}
+                        currentImageUrl={localCustomization.environmentImage}
+                    />
+                 </div>
+             )}
              <div className="space-y-2">
                 <Label>Environment Presets</Label>
                 <div className="grid grid-cols-2 gap-2">

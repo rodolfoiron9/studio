@@ -6,6 +6,12 @@ export type CubeCustomization = {
   faceColor4: string;
   faceColor5: string;
   faceColor6: string;
+  faceImage1?: string;
+  faceImage2?: string;
+  faceImage3?: string;
+  faceImage4?: string;
+  faceImage5?: string;
+  faceImage6?: string;
   edgeStyle: 'sharp' | 'round' | 'bevel';
   materialStyle: 'solid' | 'wireframe' | 'cartoon' | 'realist' | 'draw' | 'quantum dist' | 'glass' | 'metallic';
   roundness: number;

@@ -30,6 +30,7 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
   const audioAnalyserRef = React.useRef<THREE.AudioAnalyser | null>(null);
   const snowRef = React.useRef<THREE.Points | null>(null);
   const particlesRef = React.useRef<THREE.Points | null>(null);
+  const textureLoaderRef = React.useRef<THREE.TextureLoader | null>(null);
 
 
   // Effect for initialization and cleanup
@@ -38,6 +39,7 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
     if (!mount) return;
 
     // --- One-time setup ---
+    textureLoaderRef.current = new THREE.TextureLoader();
     const scene = new THREE.Scene();
     sceneRef.current = scene;
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -146,17 +148,13 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
         cameraRef.current.add(listener);
         const audio = new THREE.Audio(listener);
         try {
-            // FIX: Check if the source is already connected before setting it.
-            // This prevents errors during React Strict Mode hot reloads in development.
             if (!audio.source && !(audioElement as any)._connected) {
-                (audioElement as any)._connected = true; // Mark as connected
+                (audioElement as any)._connected = true; 
                 audio.setMediaElementSource(audioElement);
                 audioAnalyserRef.current = new THREE.AudioAnalyser(audio, 32);
             }
         } catch (e) {
              console.error("Error setting up audio source:", e);
-            // Error is expected on hot reloads, we can ignore it.
-            // A more robust solution might check if the context is already connected.
         }
     }
   }, [audioElement]);
@@ -166,14 +164,13 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
   React.useEffect(() => {
     const scene = sceneRef.current;
     const cube = cubeRef.current;
-    if (!scene || !cube) return;
+    if (!scene || !cube || !textureLoaderRef.current) return;
 
     // --- Update logic ---
     
     // Background
     if (customization.background === 'image' && customization.environmentImage) {
-      const loader = new THREE.TextureLoader();
-      loader.load(customization.environmentImage, (texture) => {
+      textureLoaderRef.current.load(customization.environmentImage, (texture) => {
           texture.mapping = THREE.EquirectangularReflectionMapping;
           scene.background = texture;
           scene.environment = texture;
@@ -249,13 +246,28 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
       customization.faceColor1, customization.faceColor2, customization.faceColor3,
       customization.faceColor4, customization.faceColor5, customization.faceColor6,
     ];
+    const faceImages = [
+      customization.faceImage1, customization.faceImage2, customization.faceImage3,
+      customization.faceImage4, customization.faceImage5, customization.faceImage6,
+    ]
     const faceTexts = [
       customization.text1, customization.text2, customization.text3,
       customization.text4, customization.text5, customization.text6,
     ];
 
     (cube.material as THREE.MeshStandardMaterial[]).forEach((mat, i) => {
-      mat.color.set(faceColors[i]);
+      const faceImage = faceImages[i];
+
+      if (faceImage) {
+        textureLoaderRef.current!.load(faceImage, (texture) => {
+          mat.map = texture;
+          mat.color.set(0xffffff); // Set color to white to not tint the texture
+          mat.needsUpdate = true;
+        });
+      } else {
+        mat.map = null;
+        mat.color.set(faceColors[i]);
+      }
       
       // Default properties
       mat.transparent = false;
@@ -289,8 +301,8 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
       if (context) {
         context.clearRect(0, 0, canvas.width, canvas.height);
         
-        // Don't draw text if the material is glass, as it causes rendering issues.
-        if (customization.materialStyle !== 'glass' && faceTexts[i]) {
+        // Don't draw text if there's a custom image or if material is glass
+        if (!faceImage && customization.materialStyle !== 'glass' && faceTexts[i]) {
             context.font = 'bold 40px "Space Grotesk"';
             context.textAlign = 'center';
             context.textBaseline = 'middle';
@@ -298,19 +310,18 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
             context.fillText(faceTexts[i], canvas.width / 2, canvas.height / 2);
         }
         
-        if (!mat.map) {
-          mat.map = new THREE.CanvasTexture(canvas);
-        } else {
-          // If a map exists, we need to tell Three.js that its content has changed.
-          mat.map.needsUpdate = true;
+        if (!faceImage) { // Only use canvas texture if there is no image
+            if (!mat.map || !(mat.map instanceof THREE.CanvasTexture)) {
+              mat.map = new THREE.CanvasTexture(canvas);
+            } else {
+              mat.map.needsUpdate = true;
+            }
         }
       }
        mat.needsUpdate = true;
     });
     
     const roundness = customization.edgeStyle === 'round' ? customization.roundness : 0;
-    // We only want to recreate geometry if it actually changes.
-    // This is a simplified check. A more robust solution might serialize geometry parameters.
     const needsNewGeometry = 
         (customization.edgeStyle === 'round' && !(cube.geometry instanceof THREE.ExtrudeGeometry)) ||
         (customization.edgeStyle !== 'round' && (cube.geometry instanceof THREE.ExtrudeGeometry)) ||
