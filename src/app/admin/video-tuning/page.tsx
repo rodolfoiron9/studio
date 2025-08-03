@@ -103,6 +103,9 @@ export default function VideoTuningPage() {
                        <video 
                             src={generatedVideo}
                             controls
+                            autoPlay
+                            loop
+                            muted
                             className="rounded-md object-cover w-full h-full"
                         />
                    )}
