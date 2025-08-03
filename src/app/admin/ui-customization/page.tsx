@@ -29,15 +29,15 @@ type ThemeFonts = {
 }
 
 const initialColors: ThemeColors = {
-    background: "234.8 64.1% 10%",
-    foreground: "240 100% 99%",
-    primary: "282.8 100% 61.4%",
-    secondary: "234.8 64.1% 20%",
-    accent: "182.5 100% 74.3%",
-    muted: "234.8 64.1% 20%",
-    border: "234.8 64.1% 20%",
-    input: "234.8 64.1% 20%",
-    ring: "182.5 100% 74.3%",
+    background: "240 4% 96%",
+    foreground: "282.8 30% 15%",
+    primary: "262.1 83.3% 57.8%",
+    secondary: "240 5% 96%",
+    accent: "262.1 83.3% 57.8%",
+    muted: "240 5% 96%",
+    border: "240 6% 90%",
+    input: "240 6% 90%",
+    ring: "262.1 83.3% 57.8%",
 };
 
 const initialFonts: ThemeFonts = {
@@ -191,7 +191,7 @@ export default function UICustomizationPage() {
                                                 disabled={isPending}
                                             />
                                             <div className="h-10 w-full rounded-md border border-input px-3 py-2 text-sm flex items-center" style={{ backgroundColor: hslToHex(value) }}>
-                                                <span className="mix-blend-difference text-white">{hslToHex(value)}</span>
+                                                <span className="text-foreground">{hslToHex(value)}</span>
                                             </div>
                                         </div>
                                     </div>
