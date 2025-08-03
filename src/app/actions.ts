@@ -119,6 +119,43 @@ export async function runTrackImporter(url: string): Promise<ActionResult<Awaite
     }
 }
 
+export async function runAssetPipeline(trackTitle: string): Promise<ActionResult<{
+    albumArt: Awaited<ReturnType<typeof generateAlbumArt>>;
+    marketing: Awaited<ReturnType<typeof generateMarketingCopy>>;
+    scene: {
+        cube: Awaited<ReturnType<typeof generateCubePreset>>;
+        environment: Awaited<ReturnType<typeof generateEnvironment>>;
+    };
+}>> {
+    try {
+        const albumArtPrompt = `An abstract, artistic album cover for a song titled "${trackTitle}".`;
+        const scenePrompt = `A 3D scene and environment inspired by a song titled "${trackTitle}".`;
+
+        const [albumArtResult, marketingResult, sceneResult] = await Promise.all([
+            generateAlbumArt({ prompt: albumArtPrompt }),
+            generateMarketingCopy({ artistName: "RudyBtz", albumName: "Making Magic", trackTitle }),
+            runFullPresetGenerator(scenePrompt)
+        ]);
+        
+        if (!sceneResult.success) {
+            throw new Error(sceneResult.error);
+        }
+
+        return {
+            success: true,
+            data: {
+                albumArt: albumArtResult,
+                marketing: marketingResult,
+                scene: sceneResult.data
+            }
+        };
+    } catch (error: any) {
+        console.error("Asset pipeline failed:", error);
+        return { success: false, error: `Failed to generate asset pipeline: ${error.message}` };
+    }
+}
+
+
 export async function saveApiKeys(keys: Record<string, string>): Promise<ActionResult<string>> {
     try {
         const envPath = path.join(process.cwd(), '.env');

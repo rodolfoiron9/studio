@@ -2,15 +2,18 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Link, Youtube, Music, Loader, Info } from "lucide-react";
-import { runTrackImporter } from "@/app/actions";
+import { Link, Youtube, Music, Loader, Info, Wand2, Twitter, Facebook, Image as ImageIcon } from "lucide-react";
+import { runTrackImporter, runAssetPipeline } from "@/app/actions";
 import type { ImportTrackOutput } from "@/ai/flows/import-track";
+import type { GenerateMarketingCopyOutput } from "@/ai/flows/generate-marketing-copy";
+import type { GenerateCubePresetOutput } from "@/ai/flows/generate-cube-preset";
 import Image from "next/image";
+import { Separator } from "@/components/ui/separator";
 
 // A placeholder for the SoundCloud icon
 const SoundCloudIcon = () => (
@@ -28,11 +31,26 @@ const SpotifyIcon = () => (
     </svg>
 );
 
+const InstagramIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
+);
+
+type PipelineAssets = {
+    albumArt: { imageUrl: string };
+    marketing: GenerateMarketingCopyOutput;
+    scene: {
+        cube: GenerateCubePresetOutput;
+        environment: { environmentImage: string };
+    }
+}
+
 
 export default function LinkImporterPage() {
     const { toast } = useToast();
-    const [isPending, startTransition] = useTransition();
+    const [isImporting, startImportTransition] = useTransition();
+    const [isGenerating, startGeneratingTransition] = useTransition();
     const [importedData, setImportedData] = useState<ImportTrackOutput | null>(null);
+    const [generatedAssets, setGeneratedAssets] = useState<PipelineAssets | null>(null);
 
     const handleImport = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -46,7 +64,8 @@ export default function LinkImporterPage() {
         }
 
         setImportedData(null);
-        startTransition(async () => {
+        setGeneratedAssets(null);
+        startImportTransition(async () => {
             toast({ title: "Importing Track...", description: "The AI agent is fetching data for the URL." });
             const result = await runTrackImporter(url);
 
@@ -60,118 +79,164 @@ export default function LinkImporterPage() {
         
         input.value = "";
     };
+
+    const handleGeneratePipeline = () => {
+        if (!importedData) return;
+        setGeneratedAssets(null);
+        startGeneratingTransition(async () => {
+            toast({ title: "Generating Full Asset Pipeline...", description: "The AI agents are creating all assets. This may take a moment." });
+            const result = await runAssetPipeline(importedData.title);
+            if(result.success && result.data) {
+                setGeneratedAssets(result.data);
+                toast({ title: "Pipeline Complete!", description: `All assets for "${importedData.title}" have been generated.` });
+            } else {
+                toast({ variant: 'destructive', title: "Error Generating Pipeline", description: result.error });
+            }
+        });
+    }
     
     return (
         <div className="p-4 md:p-8">
-            <h1 className="text-3xl font-bold mb-4 font-headline">Track Importer</h1>
-            <p className="text-muted-foreground mb-8">Import song data directly from popular music services by pasting a link.</p>
+            <h1 className="text-3xl font-bold mb-4 font-headline">Track Importer & Asset Pipeline</h1>
+            <p className="text-muted-foreground mb-8">Import song data and then generate a full suite of promotional and visual assets with a single click.</p>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div>
                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-8">
-                        {/* Spotify Importer */}
+                        {/* Importer */}
                         <Card>
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-3"><SpotifyIcon /> Spotify Importer</CardTitle>
-                                <CardDescription>Paste a link to a Spotify track.</CardDescription>
+                                <CardTitle className="flex items-center gap-3"><Link /> 1. Import Track</CardTitle>
+                                <CardDescription>Paste a link to a track to fetch its metadata.</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <form onSubmit={handleImport} className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="spotify-url">Spotify Track URL</Label>
-                                        <Input id="spotify-url" name="import-url" placeholder="https://open.spotify.com/track/..." disabled={isPending} />
-                                    </div>
-                                    <Button type="submit" className="w-full" disabled={isPending}>
-                                        {isPending ? <Loader className="animate-spin" /> : <Link className="mr-2"/>}
-                                        Import from Spotify
+                               <form onSubmit={handleImport} className="flex items-center gap-2">
+                                    <Input id="import-url" name="import-url" placeholder="https://open.spotify.com/track/..." disabled={isImporting || isGenerating} />
+                                    <Button type="submit" size="icon" disabled={isImporting || isGenerating}>
+                                        {isImporting ? <Loader className="animate-spin" /> : <Link/>}
                                     </Button>
                                 </form>
                             </CardContent>
                         </Card>
-
-                        {/* SoundCloud Importer */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-3"><SoundCloudIcon /> SoundCloud Importer</CardTitle>
-                                <CardDescription>Paste a link to a SoundCloud track.</CardDescription>
+                         <Card>
+                             <CardHeader>
+                                <CardTitle className="flex items-center gap-3"><Info /> 2. Imported Data</CardTitle>
+                                <CardDescription>The data fetched from the provided URL.</CardDescription>
                             </CardHeader>
-                            <CardContent>
-                                <form onSubmit={handleImport} className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="soundcloud-url">SoundCloud Track URL</Label>
-                                        <Input id="soundcloud-url" name="import-url" placeholder="https://soundcloud.com/user/track" disabled={isPending}/>
+                            <CardContent className="space-y-4">
+                                {isImporting && (
+                                    <div className="flex flex-col items-center justify-center h-48 gap-2 text-muted-foreground">
+                                        <Loader className="h-10 w-10 animate-spin text-primary" />
+                                        <p>Fetching data...</p>
                                     </div>
-                                    <Button type="submit" className="w-full" disabled={isPending}>
-                                        {isPending ? <Loader className="animate-spin" /> : <Link className="mr-2"/>}
-                                        Import from SoundCloud
-                                    </Button>
-                                </form>
-                            </CardContent>
-                        </Card>
-
-                        {/* YouTube Importer */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-3"><Youtube /> YouTube Importer</CardTitle>
-                                <CardDescription>Paste a link to a YouTube video.</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <form onSubmit={handleImport} className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="youtube-url">YouTube Video URL</Label>
-                                        <Input id="youtube-url" name="import-url" placeholder="https://www.youtube.com/watch?v=..." disabled={isPending}/>
+                                )}
+                                {!isImporting && !importedData && (
+                                    <div className="text-center text-muted-foreground h-48 flex flex-col items-center justify-center">
+                                        <Info className="h-12 w-12 mx-auto mb-2"/>
+                                        <p>Imported track data will be displayed here.</p>
                                     </div>
-                                    <Button type="submit" className="w-full" disabled={isPending}>
-                                        {isPending ? <Loader className="animate-spin" /> : <Link className="mr-2"/>}
-                                        Import from YouTube
-                                    </Button>
-                                </form>
+                                )}
+                                {importedData && (
+                                    <div className="space-y-4">
+                                        <div className="flex gap-4 items-center">
+                                            {importedData.artworkUrl && (
+                                                <Image 
+                                                    src={importedData.artworkUrl} 
+                                                    alt={`Artwork for ${importedData.title}`} 
+                                                    width={100} 
+                                                    height={100} 
+                                                    className="rounded-md"
+                                                />
+                                            )}
+                                            <div className="space-y-1">
+                                                <h3 className="text-xl font-bold font-headline">{importedData.title}</h3>
+                                                <p className="text-md text-muted-foreground">{importedData.artist}</p>
+                                            </div>
+                                        </div>
+                                        <Button className="w-full" onClick={handleGeneratePipeline} disabled={isGenerating}>
+                                            <Wand2 className="mr-2" />
+                                            {isGenerating ? "Generating Assets..." : "Generate Full Asset Pipeline"}
+                                        </Button>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </div>
                 </div>
 
-                <Card>
+                <Card className="max-h-[calc(100vh-12rem)] overflow-y-auto">
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2"><Info /> Imported Data</CardTitle>
-                        <CardDescription>The data fetched from the provided URL will appear here. You can then add it to your project.</CardDescription>
+                        <CardTitle className="flex items-center gap-2"><Wand2 /> 3. Generated Assets</CardTitle>
+                        <CardDescription>All assets generated by the AI pipeline will appear here.</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                        {isPending && (
+                    <CardContent className="space-y-6">
+                        {isGenerating && (
                             <div className="flex flex-col items-center justify-center h-64 gap-2 text-muted-foreground">
                                 <Loader className="h-10 w-10 animate-spin text-primary" />
-                                <p>Fetching data...</p>
+                                <p>Generating all assets...</p>
                             </div>
                         )}
-                        {!isPending && !importedData && (
+                        {!isGenerating && !generatedAssets && (
                             <div className="text-center text-muted-foreground h-64 flex flex-col items-center justify-center">
-                                <Info className="h-12 w-12 mx-auto mb-2"/>
-                                <p>Imported track data will be displayed here.</p>
+                                <Wand2 className="h-12 w-12 mx-auto mb-2"/>
+                                <p>Generated assets for the imported track will be displayed here.</p>
                             </div>
                         )}
-                        {importedData && (
-                            <div className="space-y-4">
-                                {importedData.artworkUrl && (
+                        {generatedAssets && (
+                            <div className="space-y-6">
+                                {/* Album Art */}
+                                <div>
+                                    <h3 className="font-semibold text-lg flex items-center gap-2 mb-2"><ImageIcon /> Album Art</h3>
                                      <Image 
-                                        src={importedData.artworkUrl} 
-                                        alt={`Artwork for ${importedData.title}`} 
-                                        width={200} 
-                                        height={200} 
-                                        className="rounded-md mx-auto"
+                                        src={generatedAssets.albumArt.imageUrl}
+                                        alt="Generated Album Art"
+                                        width={256}
+                                        height={256}
+                                        className="rounded-lg mx-auto"
                                     />
-                                )}
-                                <div className="space-y-1">
-                                    <h3 className="text-xl font-bold font-headline">{importedData.title}</h3>
-                                    <p className="text-md text-muted-foreground">{importedData.artist}</p>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                    <div><strong className="text-muted-foreground">Album:</strong> {importedData.album || 'N/A'}</div>
-                                    <div><strong className="text-muted-foreground">Duration:</strong> {importedData.duration}</div>
-                                    <div><strong className="text-muted-foreground">Released:</strong> {importedData.releaseDate || 'N/A'}</div>
-                                    <div><strong className="text-muted-foreground">Genre:</strong> {importedData.genre || 'N/A'}</div>
-                                    <div><strong className="text-muted-foreground">Source:</strong> {importedData.source}</div>
+                                <Separator/>
+                                {/* Marketing */}
+                                <div className="space-y-4">
+                                    <h3 className="font-semibold text-lg">Social Media Posts</h3>
+                                    <div className="space-y-2">
+                                        <h4 className="font-semibold flex items-center gap-2 text-blue-400"><Twitter /> Twitter</h4>
+                                        <p className="text-sm p-3 bg-muted rounded-md whitespace-pre-wrap">{generatedAssets.marketing.twitter}</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <h4 className="font-semibold flex items-center gap-2 text-pink-500"><InstagramIcon /> Instagram</h4>
+                                        <p className="text-sm p-3 bg-muted rounded-md whitespace-pre-wrap">{generatedAssets.marketing.instagram}</p>
+                                    </div>
                                 </div>
-                                <Button className="w-full">Add to Project Database</Button>
+                                <Separator/>
+                                {/* Scene */}
+                                <div className="space-y-4">
+                                     <h3 className="font-semibold text-lg">3D Scene Preset</h3>
+                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <h4 className="font-semibold mb-2">Environment</h4>
+                                            <Image 
+                                                src={generatedAssets.scene.environment.environmentImage}
+                                                alt="Generated Environment"
+                                                width={256}
+                                                height={144}
+                                                className="rounded-lg w-full"
+                                            />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold mb-2">Cube Colors</h4>
+                                             <div className="grid grid-cols-3 gap-2">
+                                                {Object.entries(generatedAssets.scene.cube)
+                                                    .filter(([key]) => key.startsWith('faceColor'))
+                                                    .map(([key, value]) => (
+                                                    <div key={key} className="flex items-center gap-2">
+                                                        <div className="h-6 w-6 rounded border" style={{ backgroundColor: value as string }} />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                     </div>
+                                </div>
                             </div>
                         )}
                     </CardContent>
@@ -180,5 +245,3 @@ export default function LinkImporterPage() {
         </div>
     );
 }
-
-    
