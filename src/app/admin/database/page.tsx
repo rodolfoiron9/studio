@@ -68,14 +68,14 @@ export default function DatabasePage() {
         <div className="p-4 md:p-8 h-[calc(100vh-4rem)] flex flex-col">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold font-headline">AI Data Agent</h1>
-                <p className="text-muted-foreground">Ask questions about your project's data in natural language.</p>
+                <p className="text-muted-foreground">Ask the AI to provision and manage your Firebase backend.</p>
             </div>
             
             <Card className="flex-grow flex flex-col">
                 <CardHeader className="flex flex-row justify-between items-start">
                     <div>
                         <CardTitle className="flex items-center gap-2"><Bot /> Conversation</CardTitle>
-                        <CardDescription>Ask a question like: &quot;How many tracks are in the album?&quot; or click Scan Project.</CardDescription>
+                        <CardDescription>Ask a question like: &quot;Set up Firestore rules so only admins can write articles.&quot; or click Scan Project.</CardDescription>
                     </div>
                     <Button variant="outline" onClick={handleScanProject} disabled={isPending}>
                         <Scan className="mr-2 h-4 w-4"/>
@@ -96,7 +96,7 @@ export default function DatabasePage() {
                                        "max-w-prose p-3 rounded-lg prose-sm prose-invert prose-p:my-0",
                                        message.role === 'user' ? "bg-primary text-primary-foreground" : "bg-muted"
                                     )}>
-                                        <p className="whitespace-pre-wrap font-sans">{message.content}</p>
+                                        <div className="whitespace-pre-wrap font-sans" dangerouslySetInnerHTML={{ __html: message.content.replace(/```(\w+)?\n([\s\S]+?)\n```/g, '<pre class="bg-black/80 text-white p-2 rounded-md my-2"><code>$2</code></pre>') }}></div>
                                    </div>
                                     {message.role === 'user' && (
                                        <Avatar className="w-8 h-8 border">
@@ -122,7 +122,7 @@ export default function DatabasePage() {
                         <Input 
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
-                            placeholder="Ask the AI about your data..."
+                            placeholder="Ask the AI to build something..."
                             disabled={isPending}
                             className="flex-grow"
                         />
