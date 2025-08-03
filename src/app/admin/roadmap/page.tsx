@@ -17,12 +17,13 @@ export default function RoadmapPage() {
       { title: "Link Importer", description: "Import track data from Spotify, YouTube, etc." },
     ],
     inProgress: [
-      { title: "Preset Saving & Management", description: "Save generated scenes to a database for reuse." },
-      { title: "Advanced Animation Engine", description: "Implement more complex, AI-driven cube animations." },
+      { title: "Integrating Entangled Visual Algorithms", description: "Enhance audio-reactivity to link specific visual effects to distinct audio frequencies." },
+      { title: "Developing Superpositional Audio Logic", description: "Implement audio blending and visual 'superposition' effects for the pre-selection state." },
+       { title: "Optimizing Observer Effect Interactions", description: "Refine the 'Quantum Fluctuation' feature to create subtle, user-influenced visual artifacts." },
     ],
     future: [
+      { title: "Preset Saving & Management", description: "Save generated scenes to a database for reuse across tracks." },
       { title: "Full E-commerce Integration", description: "Sell merchandise and digital downloads directly." },
-      { title: "Multi-language Support", description: "Internationalize the application content." },
       { title: "User Accounts & Profiles", description: "Allow fans to save their own cube customizations." },
     ]
   };
@@ -51,7 +52,7 @@ export default function RoadmapPage() {
     <div className="p-4 md:p-8">
       <h1 className="text-3xl font-bold mb-4 font-headline">Development Roadmap</h1>
       <p className="text-muted-foreground mb-8">
-        An overview of the project's progress and future features.
+        An overview of the project's progress and future features, now with Quantum Milestones.
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

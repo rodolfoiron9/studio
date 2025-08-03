@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI agent that generates cohesive virtual environments for the cube.
@@ -13,7 +14,7 @@ import {z} from 'genkit';
 const GenerateEnvironmentInputSchema = z.object({
   environmentDescription: z
     .string()
-    .describe('A description of the environment to generate.'),
+    .describe('A description of the environment to generate. Can include quantum-themed keywords.'),
 });
 export type GenerateEnvironmentInput = z.infer<typeof GenerateEnvironmentInputSchema>;
 
@@ -34,7 +35,14 @@ const prompt = ai.definePrompt({
   name: 'generateEnvironmentPrompt',
   input: {schema: GenerateEnvironmentInputSchema},
   output: {schema: GenerateEnvironmentOutputSchema},
-  prompt: `You are an AI agent that generates cohesive virtual environments based on a text prompt.  The user will give you a description of the environment, and you will generate an image of that environment.  The image should be a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'.
+  prompt: `You are an AI agent that generates cohesive virtual environments based on a text prompt. The user will give you a description of the environment, and you will generate an image of that environment.
+
+If the prompt includes quantum-themed keywords, interpret them artistically:
+- "superpositional nebula": A nebula with layers of different colors and shapes overlapping.
+- "entangled particle dance": Streaks of light or particles that are intertwined and move together.
+- "schrödinger's cat soundscape": An abstract, ambiguous scene that feels both alive and inert.
+
+The image should be a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'.
 
 Environment description: {{{environmentDescription}}}`,
   config: {

@@ -85,16 +85,38 @@ export function ThreeScene({ customization, audioElement }: { customization: Cub
       controls.update();
 
       if(cubeRef.current) {
-        // The animation logic is now also part of the animate loop
-        if (customization.animation === 'pulse') {
-            const scale = 1 + Math.sin(elapsedTime * 2) * 0.05;
-            cubeRef.current.scale.set(scale, scale, scale);
+        if (customization.animation === 'superposition') {
+            cubeRef.current.rotation.x += 0.005;
+            cubeRef.current.rotation.y += 0.007;
+            const hue = (elapsedTime * 10) % 360;
+            (cubeRef.current.material as THREE.MeshStandardMaterial[]).forEach(mat => {
+                 mat.color.setHSL(hue / 360, 0.7, 0.6);
+            });
         } else if (customization.animation === 'audio-reactive' && audioAnalyserRef.current) {
-            const freq = audioAnalyserRef.current.getAverageFrequency();
-            const scale = 1 + (freq / 255) * 0.2;
+            const freqData = audioAnalyserRef.current.getFrequencyData();
+            const lowerHalf = freqData.slice(0, (freqData.length / 2) - 1);
+            const upperHalf = freqData.slice((freqData.length / 2) - 1, freqData.length - 1);
+            const lowerAvg = lowerHalf.reduce((a, b) => a + b, 0) / lowerHalf.length;
+            const upperAvg = upperHalf.reduce((a, b) => a + b, 0) / upperHalf.length;
+
+            const bassPulse = 1 + (lowerAvg / 256) * 0.2;
+            cubeRef.current.scale.set(bassPulse, bassPulse, bassPulse);
+            
+            cubeRef.current.rotation.y += (upperAvg / 256) * 0.01;
+
+        } else if (customization.animation === 'pulse') {
+            const scale = 1 + Math.sin(elapsedTime * 2) * 0.05;
             cubeRef.current.scale.set(scale, scale, scale);
         } else {
             cubeRef.current.scale.set(1, 1, 1);
+        }
+
+        // Observer Effect
+        if (customization.quantumFluctuation > 0 && Math.random() < customization.quantumFluctuation / 100) {
+           (cubeRef.current.material as THREE.MeshStandardMaterial[]).forEach(mat => {
+                mat.wireframe = !mat.wireframe;
+                setTimeout(() => { mat.wireframe = false; }, 50); // flicker
+           });
         }
       }
       

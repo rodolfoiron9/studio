@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    --background: 240 4% 96%;
+    --background: 240 43% 84%;
     --foreground: 282.8 30% 15%;
 
     --card: 240 4% 96%;
@@ -49,8 +49,8 @@
   }
 
   .dark {
-    --background: 234.8 64.1% 10%;
-    --foreground: 282.8 100% 95%;
+    --background: 240 43% 84%;
+    --foreground: 282.8 30% 15%;
 
     --card: 234.8 64.1% 10%;
     --card-foreground: 282.8 100% 95%;
@@ -58,24 +58,24 @@
     --popover: 234.8 64.1% 10%;
     --popover-foreground: 240 100% 99%;
 
-    --primary: 282.8 100% 61.4%;
+    --primary: 262.1 83.3% 57.8%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 234.8 64.1% 20%;
+    --secondary: 240 5% 96%;
     --secondary-foreground: 240 100% 99%;
 
-    --muted: 234.8 64.1% 20%;
+    --muted: 240 5% 96%;
     --muted-foreground: 240 5% 75%;
 
-    --accent: 282.8 100% 61.4%;
+    --accent: 262.1 83.3% 57.8%;
     --accent-foreground: 234.8 64.1% 10%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 234.8 64.1% 20%;
-    --input: 234.8 64.1% 20%;
-    --ring: 182.5 100% 74.3%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 262.1 83.3% 57.8%;
     
     /* Font variables */
     --font-headline: 'Space Grotesk', sans-serif;

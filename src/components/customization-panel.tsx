@@ -245,6 +245,11 @@ export function CustomizationPanel({ customization, setCustomization }: Customiz
                 </RadioGroup>
             </div>
 
+            <div className="space-y-2">
+                <Label htmlFor="quantumFluctuation">Quantum Fluctuation: {localCustomization.quantumFluctuation.toFixed(0)}%</Label>
+                <Slider id="quantumFluctuation" name="quantumFluctuation" min={0} max={100} step={1} value={[localCustomization.quantumFluctuation]} onValueChange={([val]) => handleValueChange('quantumFluctuation', val)} />
+            </div>
+
           </TabsContent>
           <TabsContent value="text" className="space-y-4 pt-4">
              <div className="space-y-4">

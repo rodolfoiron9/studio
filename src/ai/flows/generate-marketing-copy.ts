@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI agent that generates marketing copy for social media.
@@ -32,18 +33,18 @@ const prompt = ai.definePrompt({
   name: 'generateMarketingCopyPrompt',
   input: {schema: GenerateMarketingCopyInputSchema},
   output: {schema: GenerateMarketingCopyOutputSchema},
-  prompt: `You are an expert music marketing agent. Your goal is to generate exciting and engaging social media posts to promote a new track.
+  prompt: `You are an expert music marketing agent for an innovative artist. Your goal is to generate exciting and engaging social media posts to promote a new track.
+
+Your tone should be professional, exciting, and authentic to a producer who blends genres like Drum and Bass, Trap, and Samba. Importantly, you should weave in conceptual language related to quantum physics to describe the unique, interactive nature of the album experience. Use terms like 'superposition,' 'entanglement,' 'observer effect,' 'collapse the wave,' 'quantum leap' to create intrigue.
 
 Artist: {{{artistName}}}
 Album: {{{albumName}}}
 Track to Promote: {{{trackTitle}}}
 
 Generate social media copy for the following platforms:
-- Twitter: A short, punchy tweet. Use relevant hashtags.
-- Instagram: An engaging caption. Use emojis and hashtags.
-- Facebook: A slightly longer post to encourage discussion and sharing.
-
-The tone should be professional, exciting, and authentic to an innovative music producer who blends genres like Drum and Bass, Trap, and Samba.
+- Twitter: A short, punchy tweet. Use relevant hashtags. Example: "Experience '{{{trackTitle}}}'. Every listen collapses a new superposition of sound! #QuantumMusic #RudyBtz"
+- Instagram: An engaging caption. Use emojis and hashtags. Talk about the 'entangled' visuals that react to every note.
+- Facebook: A slightly longer post. Encourage discussion by asking fans what 'reality' they discovered while listening.
 `,
 });
 

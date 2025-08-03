@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -14,7 +15,7 @@ import {z} from 'genkit';
 const GenerateCubePresetInputSchema = z.object({
   musicStyle: z
     .string()
-    .describe('The musical style or mood for which to generate the preset.'),
+    .describe('The musical style, mood, or quantum-themed concept for which to generate the preset.'),
 });
 export type GenerateCubePresetInput = z.infer<typeof GenerateCubePresetInputSchema>;
 
@@ -55,9 +56,14 @@ const prompt = ai.definePrompt({
   name: 'generateCubePresetPrompt',
   input: {schema: GenerateCubePresetInputSchema},
   output: {schema: GenerateCubePresetOutputSchema},
-  prompt: `You are an AI agent that generates cube customization presets based on musical styles or moods. The user will provide a music style or mood, and you will generate a cube preset that matches that style or mood.
+  prompt: `You are an AI agent that generates cube customization presets based on musical styles, moods, or abstract concepts. The user will provide a prompt, and you will generate a cube preset that matches that theme.
 
-Music Style/Mood: {{{musicStyle}}}
+If the prompt includes quantum-themed keywords (like 'superpositional,' 'entangled,' 'quantum foam'), interpret them visually.
+- 'Superpositional' could mean a mix of contrasting but harmonious colors.
+- 'Entangled' could imply interconnected or mirrored color schemes across faces.
+- 'Quantum Foam' might suggest a more chaotic, varied color palette.
+
+Prompt: {{{musicStyle}}}
 
 Generate a cube customization preset with the following attributes:
 - faceColor1: The color for face 1 in hex format.

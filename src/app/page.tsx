@@ -42,10 +42,11 @@ export default function Home() {
     text4: "",
     text5: "",
     text6: "",
-    animation: "pulse",
+    animation: "superposition", // Start in superposition state
     environmentImage: "",
     environmentVideo: "",
     lyricDisplay: 'underneath',
+    quantumFluctuation: 0,
   });
 
   const handleTimeUpdate = () => {
@@ -125,7 +126,7 @@ export default function Home() {
       setCurrentLyric(null);
       setCustomization(prev => ({
         ...prev, 
-        animation: 'pulse',
+        animation: 'superposition',
         text1: "RUDYBTZ", text2: "THE ALBUM", text3: "", text4: "", text5: "", text6: ""
       }));
     });
@@ -160,7 +161,7 @@ export default function Home() {
           clearInterval(lyricInterval);
            setCustomization(prev => ({
             ...prev, 
-            animation: 'pulse',
+            animation: 'superposition',
             text1: "RUDYBTZ", text2: "MAKING MAGIC", text3: "", text4: "", text5: "", text6: ""
           }));
         }
@@ -238,7 +239,7 @@ export default function Home() {
         />
       )}
 
-      {!isPlaying && !playingTrack && <LandingContent 
+      {!playingTrack && <LandingContent 
         onTrackSelect={handleTrackSelect}
         playingTrack={playingTrack}
         isPlaying={isPlaying}

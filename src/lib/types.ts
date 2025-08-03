@@ -29,6 +29,7 @@ export type CubeCustomization = {
   environmentImage: string;
   environmentVideo: string;
   lyricDisplay: 'underneath' | 'cube' | 'off';
+  quantumFluctuation: number;
 };
 
 export type Lyric = {

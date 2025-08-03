@@ -15,7 +15,7 @@ import wav from 'wav';
 import { Readable } from 'stream';
 
 const GenerateVideoInputSchema = z.object({
-  prompt: z.string().describe('A description of the video to generate.'),
+  prompt: z.string().describe('A description of the video to generate, can include quantum themes.'),
 });
 export type GenerateVideoInput = z.infer<typeof GenerateVideoInputSchema>;
 
@@ -63,9 +63,15 @@ const generateVideoFlow = ai.defineFlow(
     outputSchema: GenerateVideoOutputSchema,
   },
   async (input) => {
+      // Pre-process prompt to better guide Veo for quantum themes
+      let finalPrompt = input.prompt;
+      if (finalPrompt.includes('quantum') || finalPrompt.includes('particle') || finalPrompt.includes('superposition')) {
+          finalPrompt += ", abstract, fluid, morphing, non-linear, unpredictable, subtle energy shifts, particle fluctuations, cinematic";
+      }
+
       let { operation } = await ai.generate({
         model: googleAI.model('veo-2.0-generate-001'),
-        prompt: input.prompt,
+        prompt: finalPrompt,
         config: {
             durationSeconds: 5,
             aspectRatio: '16:9',
