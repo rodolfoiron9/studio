@@ -125,6 +125,8 @@ export default function DatabasePage() {
                             placeholder="Ask the AI to build something..."
                             disabled={isPending}
                             className="flex-grow"
+                            suppressHydrationWarning
+                            spellCheck={false}
                         />
                         <Button type="submit" size="icon" disabled={isPending || !query.trim()}>
                            {isPending ? <Loader className="animate-spin" /> : <Send />}
